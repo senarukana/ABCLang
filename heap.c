@@ -20,6 +20,16 @@ static void check_gc() {
     }
 }
 
+/* protect the object in ref, in case it is collected by gc */ 
+static void add_ref_in_native_method(LocalEnvironment *env, ABC_Object *obj) {
+    RefInNativeFunc *new_ref;
+
+    new_ref = MEM_malloc(sizeof(RefInNativeFunc));
+    new_ref->object = obj;
+    new_ref->next = env->ref_in_native_func;
+    env->ref_in_native_func = new_ref;
+}
+
 static ABC_Object *alloc_object(ObjectType type) {
     ABC_Object *obj;
     ABC_Interpreter *inter;
@@ -34,7 +44,7 @@ static ABC_Object *alloc_object(ObjectType type) {
     if (obj->next) {
         obj->next->prev = obj;
     }
-
+    inter->heap.current_heap_size += sizeof(ABC_Object);
     return obj;
 }
 
@@ -70,6 +80,30 @@ ABC_Object *abc_create_string(ABC_Char *str) {
     obj = alloc_object(STRING_OBJECT);
     obj->u.str.is_literal = ABC_True;
     obj->u.str.str = str;
+
+    return obj;
+}
+
+ABC_Object *abc_create_array_safe(int size) {
+    ABC_Object *obj;
+    ABC_Interpreter *inter;
+
+    inter = abc_get_interpreter();
+    obj = alloc_object(ARRAY_OBJECT);
+    obj->u.array.size = size;
+    obj->u.array.alloc_size = size;
+    obj->u.array.array = MEM_malloc(sizeof(ABC_Value) * size);
+
+    inter->heap.current_heap_size += sizeof(ABC_Value) * size;
+
+    return obj;
+}
+
+ABC_Object *abc_create_array(LocalEnvironment *env, int size) {
+    ABC_Object *obj;
+
+    obj = abc_create_array_safe(size);
+    add_ref_in_native_method(env, obj);
 
     return obj;
 }

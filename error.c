@@ -20,6 +20,8 @@ MessageFormat runtime_error_msg[] = {
     {"FUNCTION_NOT_FOUND_ERR"},
     {"ARGUMENT_TOO_MANY_ERR"},
     {"ARGUMENT_TOO_FEW_ERR"},
+    {"INVALID_LVALUE_ERR"},
+    {"INVALID_INCR_OR_DECR_OPERATOR_ERR"},
     {"ASSIGN_EXPRESSION_ERR"},
     {"BAD_OPERATOR_FOR_STRING_ERR"},
     {"NULL_OPERATOR_ERR"},
@@ -28,6 +30,9 @@ MessageFormat runtime_error_msg[] = {
     {"INCR_OPERATOR_ERR"},
     {"DIV_ZERO_ERR"},
     {"NOT_BOOLEAN_TYPE_ERR"},
+    {"INFINITE_WHILE_LOOP_ERR"},
+    {"INVALID_ARRAY_EXPRESSION_ERR"},
+    {"ARRAY_INDEX_OUT_OF_RANGE"},
     {"dummy"},
 };
 

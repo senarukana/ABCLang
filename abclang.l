@@ -18,7 +18,6 @@ static void increment_line_number() {
 <INITIAL>"def"          return FUNCTION;
 <INITIAL>"if"           return IF;
 <INITIAL>"else"         return ELSE;
-<INITIAL>"elseif"       return ELSEIF;
 <INITIAL>"for"          return FOR;
 <INITIAL>"while"        return WHILE;
 <INITIAL>"return"       return RETURN;
@@ -86,6 +85,7 @@ static void increment_line_number() {
     abc_compile_error(PARSE_ERR, "invalid syntax");
 }
 
+<COMMENT_STATE>.    ;
 <COMMENT_STATE>\n  { 
     increment_line_number();
     BEGIN INITIAL;

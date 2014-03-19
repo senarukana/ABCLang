@@ -32,7 +32,7 @@ ABC_Value abc_sys_print_proc(LocalEnvironment *env,
 
     result.type = ABC_NULL_VALUE;
     str = abc_value_to_string(&args[0]);
-    abc_wcs_print(stdout, str);
+    abc_wcs_print(stderr, str);
     
     return result;
 }
@@ -46,7 +46,7 @@ ABC_Value abc_sys_println_proc(LocalEnvironment *env,
 
     result.type = ABC_NULL_VALUE;
     str = abc_value_to_string(&args[0]);
-    abc_wcs_println(stdout, str);
+    abc_wcs_println(stderr, str);
     
     return result;
 }
@@ -221,6 +221,42 @@ ABC_Value abc_sys_fputs_proc(LocalEnvironment *env,
     value.type = ABC_INT_VALUE;
     fp = args[1].u.pointer.pointer;
     value.u.int_val = abc_wcs_print(fp, args[0].u.object->u.str.str);
+
+    return value;
+}
+
+static ABC_Value new_array_sub(LocalEnvironment *env, 
+            int arg_count, ABC_Value *args, int line_num, int idx) {
+    ABC_Value val;
+    int i, size;
+
+    check_args_type(&args[idx], ABC_INT_VALUE, line_num);
+
+    size = args[idx].u.int_val;
+    val.u.object = abc_create_array(env, size);
+
+    if (idx == arg_count) {
+        for (i = 0; i < size; i++) {
+            val.u.object->u.array.array[i].type = ABC_NULL_VALUE;
+        }
+    } else {
+        for (i = 0; i < size; i++) {
+            val.u.object->u.array.array[i] = 
+                new_array_sub(env, arg_count, args, line_num, idx+1);
+        }
+    }
+
+    return val;
+} 
+#define MAX_ARRAY_DIMENTIONS 10
+/* create the array recursively */
+ABC_Value abc_new_array_proc(LocalEnvironment *env, 
+            int arg_count, ABC_Value *args, int line_num) {
+    ABC_Value value;
+
+    check_args_range(arg_count, 1, MAX_ARRAY_DIMENTIONS, line_num);
+
+    value = new_array_sub(env, arg_count, args, line_num, 0);
 
     return value;
 }

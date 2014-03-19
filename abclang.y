@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "abclang.h"
 #define YYDEBUG 1
+extern int yylex();
+extern int yyerror();
 %}  
 
 %union {
@@ -24,22 +26,23 @@
 %token <string>     STRING_LITERAL
 %token <identifier>     IDENTIFIER
 
-%token FUNCTION IF ELSE ELSEIF WHILE FOR RETURN BREAK CONTINUE NULL_T INCR DECR
+%token FUNCTION IF ELSE WHILE FOR RETURN BREAK CONTINUE NULL_T INCR DECR
         LP RP LB RB LC RC DOT SEMICOLON COMMA  
         ASSIGN LOGICAL_AND LOGICAL_OR
         EQ NE GT GE LT LE ADD SUB MUL DIV MOD TRUE_T FALSE_T
 %type   <param_list> parameter_list
 %type   <arg_list> argument_list
 %type   <expression> expression expression_opt
-        statement_expression assign_expression function_call_expression method_call_expression 
+        assign_expression function_call_expression
         logical_and_expression logical_or_expression
         equality_expression relational_expression
-        add_sub_expression mul_div_mod_expression incr_decr_expression 
-        minus_expression postfix_expression primary_expression
+        add_sub_expression mul_div_mod_expression 
+        array_expression minus_expression postfix_expression primary_expression
 %type   <statement> statement 
         if_statement while_statement for_statement
         return_statement break_statement continue_statement
 %type   <statement_list> statement_list
+%type   <expression_list> expression_list
 %type   <block> block
 %type   <elseif> elseif elseif_list
 %%
@@ -53,7 +56,6 @@ def_or_statement:
             ABC_Interpreter *inter = abc_get_interpreter();
             inter->statement_list = abc_chain_statement_list(
                 inter->statement_list, $1);
-            fprintf(stderr,"ok!\n");
         }
     ;
 function_def:
@@ -100,7 +102,7 @@ statement_list:
     ;
 
 statement:
-        statement_expression SEMICOLON {
+        expression SEMICOLON {
             $$ = abc_create_expression_statement($1);
         } 
     |   if_statement
@@ -139,15 +141,18 @@ elseif: ELSE IF expression block {
         }
     ; 
 
-for_statement: FOR expression_opt COMMA expression_opt COMMA expression_opt block {
-        $$ = abc_create_for_statement($2, $4, $6, $7);
-    }
+for_statement:
+        FOR LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP block {
+            $$ = abc_create_for_statement($3, $5, $7, $9);
+        }
     ;
 
-while_statement: WHILE expression block {
-        $$ = abc_create_while_statement($2, $3); 
-    }
+while_statement: 
+        WHILE expression block {
+            $$ = abc_create_while_statement($2, $3); 
+        }
     ;
+
 return_statement: RETURN expression SEMICOLON {
         $$ = abc_create_return_statement($2);
     }
@@ -168,37 +173,14 @@ expression_opt:
     |   expression
     ;
 
-statement_expression:
-        assign_expression
-    |   method_call_expression
-    |   function_call_expression
-    ;
+expression: assign_expression;
 
 assign_expression:
-       expression ASSIGN expression {
+        logical_or_expression
+    |   postfix_expression ASSIGN expression {
             $$ = abc_create_assign_expression($1, $3);
         }
     ;
-
-method_call_expression:
-        postfix_expression DOT IDENTIFIER LP argument_list RP {
-            $$ = abc_create_method_call_expression($1, $3, $5);
-        }
-    |   postfix_expression DOT IDENTIFIER LP RP {
-            $$ = abc_create_method_call_expression($1, $3, NULL);
-        }
-    ;
-
-function_call_expression:
-        IDENTIFIER LP argument_list RP {
-            $$ = abc_create_function_call_expression($1, $3);
-        }
-    |   IDENTIFIER LP RP {
-            $$ = abc_create_function_call_expression($1, NULL);
-        }
-    ;
-
-expression: logical_or_expression;
 
 logical_or_expression:
         logical_and_expression
@@ -251,25 +233,15 @@ add_sub_expression:
     ;
 
 mul_div_mod_expression:
-        incr_decr_expression 
-    |   mul_div_mod_expression MUL incr_decr_expression {
+        minus_expression 
+    |   mul_div_mod_expression MUL minus_expression {
             $$ = abc_create_binary_expression(MUL_EXPRESSION, $1, $3);
         }
-    |   mul_div_mod_expression DIV incr_decr_expression {
+    |   mul_div_mod_expression DIV minus_expression {
             $$ = abc_create_binary_expression(DIV_EXPRESSION, $1, $3);
         }
-    |   mul_div_mod_expression MOD incr_decr_expression {
+    |   mul_div_mod_expression MOD minus_expression {
             $$ = abc_create_binary_expression(MOD_EXPRESSION, $1, $3);
-        }
-    ;
-
-incr_decr_expression:
-        minus_expression
-    |   incr_decr_expression INCR {
-            $$ = abc_create_singular_expression(INCREMENT_EXPRESSION, $1);
-        }
-    |   incr_decr_expression DECR {
-            $$ = abc_create_singular_expression(DECREMENT_EXPRESSION, $1);
         }
     ;
 
@@ -284,12 +256,24 @@ postfix_expression:
         primary_expression
     |   postfix_expression LB expression RB {
             $$ = abc_create_index_expression($1, $3);
-        }   
+        }
+    |   postfix_expression DOT IDENTIFIER LP argument_list RP {
+            $$ = abc_create_method_call_expression($1, $3, $5);
+        }
+    |   postfix_expression DOT IDENTIFIER LP RP {
+            $$ = abc_create_method_call_expression($1, $3, NULL);
+        }
+    |   postfix_expression INCR {
+            $$ = abc_create_singular_expression(INCREMENT_EXPRESSION, $1);
+        }
+    |   postfix_expression DECR {
+            $$ = abc_create_singular_expression(DECREMENT_EXPRESSION, $1);
+        }
     ;
+
 
 primary_expression:
         function_call_expression
-    |   method_call_expression
     |   LP expression RP {
             $$ = $2;
         }
@@ -314,5 +298,34 @@ primary_expression:
     |   NULL_T {
             $$ = abc_create_null_expression();
         }
+    |   array_expression
     ;
+
+function_call_expression:
+        IDENTIFIER LP argument_list RP {
+            $$ = abc_create_function_call_expression($1, $3);
+        }
+    |   IDENTIFIER LP RP {
+            $$ = abc_create_function_call_expression($1, NULL);
+        }
+    ;
+
+expression_list:
+        /* empty */ {
+            $$ = NULL;
+        }
+    |   expression {
+            $$ = abc_create_expression_list($1);
+        }
+    |   expression_list COMMA expression {
+            $$ = abc_chain_expression_list($1, $3);
+        }
+    ;
+
+array_expression: 
+        LC expression_list RC {
+            $$ = abc_create_array_expression($2);
+        }
+    ;
+
 %%

@@ -1,0 +1,47 @@
+a = 10;
+println(a);
+b = 20;
+c = a+b;
+d = a*b;
+e = a/b;
+println(c);
+println(d);
+println(e);
+f = 10.5;
+println(f*10);
+
+#while
+while (a > 0) {
+    println(a);
+    if (a < 3) {
+        println("break");
+        break;
+    }
+    a--;
+}
+
+println(-1);
+
+println(a);
+
+#for
+for (i = 0; i < 10; i++) {
+    println(i*i);
+}
+
+print("please input a word:");
+s = fgets(STDIN);
+
+print("your word is :"+s);
+
+#func
+def hello_world() {
+    println("Hello World!");
+}
+
+hello_world();
+#hello_world();
+
+#array
+arr = {1,2,4};
+println(arr[-1]);

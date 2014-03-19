@@ -76,17 +76,76 @@ static StatementResult execute_if_statement(LocalEnvironment *env, IfStatement *
 
 static StatementResult execute_for_statement(LocalEnvironment *env, ForStatement *stmt, int line_num) {
     StatementResult result;
+    ABC_Value cond;
 
     result.type = NORMAL_STATEMENT_RESULT;
+    if (stmt->init) {
+        abc_eval_expression(env,stmt->init);
+    }
+    for (;;) {
+        if (stmt->cond != NULL) {
+            cond = abc_eval_expression(env, stmt->cond);
+            if (cond.type != ABC_BOOLEAN_VALUE) {
+                abc_runtime_error(line_num, UNCOMPARABLE_EXPRESSION_ERR);
+            }
+            if (!cond.u.bool_val) {
+                goto FOR_END;
+            }
+        }
 
+        result = abc_execute_statement_list(env, stmt->block->statement_list);
+        switch(result.type) {
+        case RETURN_STATEMENT_RESULT:
+            goto FOR_END;
+            break;
+        case BREAK_STATEMENT_RESULT:
+            result.type = NORMAL_STATEMENT_RESULT;
+            goto FOR_END;
+            break;
+        default:    /* CONTINUE_STATEMENT, NORMAL_STATEMENT */
+            break;
+        }
+        if (stmt->post) {
+            abc_eval_expression(env, stmt->post);
+        }
+    }
+FOR_END:
     return result;
 }
 
 static StatementResult execute_while_statement(LocalEnvironment *env, WhileStatement *stmt, int line_num) {
     StatementResult result;
+    ABC_Value cond;
 
     result.type = NORMAL_STATEMENT_RESULT;
+    for (;;) {
+        if (stmt->cond != NULL) {
+            cond = abc_eval_expression(env, stmt->cond);
+            if (cond.type != ABC_BOOLEAN_VALUE) {
+                abc_runtime_error(line_num, UNCOMPARABLE_EXPRESSION_ERR);
+            }
+            if (!cond.u.bool_val) {
+                goto WHILE_END;
+            }
+        }
+        if (stmt->block == NULL) {
+            abc_runtime_error(line_num, INFINITE_WHILE_LOOP_ERR);
+        }
+        result = abc_execute_statement_list(env, stmt->block->statement_list);
+        switch(result.type) {
+        case RETURN_STATEMENT_RESULT:
+            goto WHILE_END;
+            break;
+        case BREAK_STATEMENT_RESULT:
+            result.type = NORMAL_STATEMENT_RESULT;
+            goto WHILE_END;
+            break;
+        default:    /* CONTINUE_STATEMENT, NORMAL_STATEMENT */
+            break;
+        }
+    }
 
+WHILE_END:
     return result;
 }
 

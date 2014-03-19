@@ -224,7 +224,6 @@ static void eval_binary_double_expression(ExpressionType type,
     } else {
         result->type = ABC_DOUBLE_VALUE;
     }
-    printf("%f %f\n", left, right);
     switch(type) {
     case ADD_EXPRESSION:
         result->u.double_val = left + right;
@@ -315,8 +314,8 @@ static void eval_binary_expression(LocalEnvironment *env,
     ABC_Value result;
 
     eval_expression(env, left);
-    eval_expression(env, right);
     left_val = abc_stack_pop_value();
+    eval_expression(env, right);
     right_val = abc_stack_pop_value();
 
     if (left_val.type == ABC_INT_VALUE && right_val.type == ABC_INT_VALUE) {
@@ -400,29 +399,76 @@ static void eval_minus_expression(LocalEnvironment *env, Expression *expr) {
     abc_stack_push_value(&result);
 }
 
+static ABC_Value *get_array_element_value(LocalEnvironment *env,
+            Expression *expr_array, Expression *expr_index) {
+    ABC_Value array_val, index_val;
+    int size, index; 
+
+    eval_expression(env, expr_array);
+    array_val = abc_stack_pop_value();
+    eval_expression(env, expr_index);
+    index_val = abc_stack_pop_value();
+    if (array_val.type != ABC_ARRAY_VALUE && index_val.type != ABC_INT_VALUE) {
+        abc_runtime_error(expr_array->line_num, INVALID_ARRAY_EXPRESSION_ERR);
+    }
+
+    size = array_val.u.object->u.array.size;
+    index = index_val.u.int_val;
+    if (index > size) {
+        abc_runtime_error(expr_array->line_num, ARRAY_INDEX_OUT_OF_RANGE);
+    }
+    if (index < 0) {
+        index += size; 
+    }
+    return &array_val.u.object->u.array.array[index];
+}
+
+ABC_Value *get_lvalue(LocalEnvironment *env, Expression *expr) {
+    ABC_Value *val = NULL;
+    VariableList *vp;
+
+    if (expr->type == IDENTIFIER_EXPRESSION) {
+        vp = search_variable(env, expr->u.identifier);
+        if (vp == NULL) {
+            abc_runtime_error(expr->line_num, VARIABLE_NOT_FOUND_ERR);        
+        } else {
+            val = &vp->value;
+        }
+    } else if (expr->type == INDEX_EXPRESSION) {
+    } else {
+        abc_runtime_error(expr->line_num, INVALID_LVALUE_ERR);
+    }
+    return val;
+}
+
 static void eval_incre_decre_expression(LocalEnvironment *env, 
                 ExpressionType type, Expression *expr) {
     ABC_Value result;
-    ABC_Value val;
+    ABC_Value *val;
 
-    eval_expression(env, expr);
-    val = abc_stack_pop_value();
-    switch(val.type) {
+    val = get_lvalue(env, expr);
+    if (val->type != ABC_INT_VALUE && val->type != ABC_DOUBLE_VALUE) {
+        abc_runtime_error(expr->line_num, INVALID_INCR_OR_DECR_OPERATOR_ERR);
+    }
+
+    switch(val->type) {
     case ABC_INT_VALUE:
         result.type = ABC_INT_VALUE;
         if (type == INCREMENT_EXPRESSION) {
-            result.u.int_val++;
+            val->u.int_val++;
         } else {
-            result.u.int_val--;
+            val->u.int_val--;
         }
+        result.u.int_val = val->u.int_val;
         break;
     case ABC_DOUBLE_VALUE:
         result.type = ABC_DOUBLE_VALUE;
         if (type == INCREMENT_EXPRESSION) {
-            result.u.double_val++;
+            val->u.double_val++;
         } else {
-            result.u.double_val--;
+            val->u.double_val--;
         }
+        result.u.double_val = val->u.double_val;
         break;
     default:
         abc_runtime_error(expr->line_num, INCR_OPERATOR_ERR);
@@ -432,31 +478,33 @@ static void eval_incre_decre_expression(LocalEnvironment *env,
 
 
 static void eval_assign_expression(LocalEnvironment *env, Expression *left, Expression *right) {
-    ABC_Value val;
-    VariableList *vp;
+    ABC_Value       *lval, rval;
+    VariableList    *vp;
 
     eval_expression(env, right);
-    val = abc_stack_pop_value();
+    rval = abc_stack_pop_value();
+
     if (left->type == IDENTIFIER_EXPRESSION) {
         vp = search_variable(env, left->u.identifier); 
         if (vp != NULL) {
-            if (vp->value.type == val.type) {
-                vp->value = val;
+            if (vp->value.type == rval.type) {
+                vp->value = rval;
             } else {
                 abc_runtime_error(left->line_num, INCOMPATIBLE_VARIABLE_TYPE_ERR);
             }
         } else {
             if (env != NULL) {
-                abc_add_local_variable(env, left->u.identifier, &val);
+                abc_add_local_variable(env, left->u.identifier, &rval);
             } else {
                 if (search_function(left->u.identifier)) {
                     abc_runtime_error(left->line_num, GLOBAL_VARIABLE_CONTRADICT_ERR);
                 }
-                abc_add_global_variable(left->u.identifier, &val);
+                abc_add_global_variable(left->u.identifier, &rval);
             }
         }
     } else if (left->type == INDEX_EXPRESSION) {
-        printf("index expresion\n");
+        lval = get_array_element_value(env, left->u.index_expr.array, left->u.index_expr.idx);
+        *lval = rval;
         return;
     } else {
         abc_runtime_error(left->line_num ,ASSIGN_EXPRESSION_ERR);
@@ -471,7 +519,7 @@ static void call_user_function(LocalEnvironment *env, LocalEnvironment *new_env,
     ParameterList *pp;
 
     for (pp = fd->u.user_function.params, ap = arg_list; 
-        pp->next != NULL && ap->next != NULL; 
+        pp != NULL && ap != NULL; 
         ap = ap->next, pp = pp->next) {
         eval_expression(new_env, ap->expr);
         val = abc_stack_pop_value();
@@ -519,13 +567,40 @@ static void eval_function_call_expression(LocalEnvironment *env,
         abc_runtime_error(line_num, FUNCTION_NOT_FOUND_ERR);
     } 
     new_env = alloc_local_environment();
-
     if (fd->type == SYSTEM_FUNCTION) {
         call_system_function(env, new_env, fd, arg_list, line_num);
     } else {
         call_user_function(env, new_env, fd, arg_list, line_num);
     }
     dispose_local_environment();
+}
+
+
+static void eval_index_expression(LocalEnvironment *env, 
+            Expression *array, Expression *index) {
+    ABC_Value *val;
+
+    val = get_array_element_value(env, array, index);
+
+    abc_stack_push_value(val);
+}
+
+static void eval_array_expression(LocalEnvironment *env, 
+            ExpressionList *list, int line_num) {
+    ABC_Value val;
+    ExpressionList *ep;
+    int i, size = 0;
+
+    for (ep = list; ep; ep = ep->next) {
+        size++;
+    }
+    val.type = ABC_ARRAY_VALUE;
+    val.u.object = abc_create_array_safe(size);
+    for (i = 0, ep = list; i < size; i++, ep = ep->next) {
+        eval_expression(env, ep->expr);
+        val.u.object->u.array.array[i] = abc_stack_pop_value();
+    }
+    abc_stack_push_value(&val);
 }
 
 
@@ -551,6 +626,14 @@ static void eval_expression(LocalEnvironment *env, Expression *expr) {
     case ASSIGN_EXPRESSION:
         eval_assign_expression(env, 
             expr->u.assign_expr.left, expr->u.assign_expr.right);
+        break;
+    case ARRAY_EXPRESSION:
+        eval_array_expression(env,
+            expr->u.array_expr, expr->line_num);
+        break;
+    case INDEX_EXPRESSION:
+        eval_index_expression(env,
+            expr->u.index_expr.array, expr->u.index_expr.idx);
         break;
     case LOGICAL_AND_EXPRESSION:
     case LOGICAL_OR_EXPRESSION:
@@ -593,6 +676,5 @@ static void eval_expression(LocalEnvironment *env, Expression *expr) {
 
 ABC_Value abc_eval_expression(LocalEnvironment *env, Expression *expr) {
     eval_expression(env, expr);
-    fprintf(stderr, "complete\n");
     return abc_stack_pop_value();
 }

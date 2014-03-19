@@ -36,6 +36,7 @@ static void add_system_procs() {
     add_system_proc("fwrite", abc_sys_fwrite_proc);*/
     add_system_proc("fgets", abc_sys_fgets_proc);
     add_system_proc("fputs", abc_sys_fputs_proc);
+    add_system_proc("new_array", abc_new_array_proc);
 }
 
 
@@ -45,6 +46,7 @@ ABC_Interpreter *ABC_create_interpreter() {
     interpret_storage = MEM_open_storage(0);
     inter = MEM_storage_malloc(interpret_storage,
                 sizeof(struct ABC_Interpreter_tag));
+    inter->line_num = 1;
     inter->interpreter_storage = interpret_storage;
     inter->global_variable = NULL;
     inter->statement_list = NULL;

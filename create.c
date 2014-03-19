@@ -21,6 +21,7 @@ void abc_create_function(char *identifier, ParameterList *params, Block *block) 
         if (strcmp(fp->identifier, identifier) == 0) {
             break;
         }
+        fp = fp->next;
     }
     /*found it in func_list*/
     if (fp != NULL) {
@@ -51,6 +52,9 @@ ParameterList *abc_chain_parameter(ParameterList *param_list, char *identifier) 
 
     p = param_list;
     param = abc_create_parameter(identifier);
+    if (param_list == NULL) {
+        return param;
+    }
     for (p = param_list; p->next; p = p->next);
     p->next = param;
     return param_list;
@@ -67,6 +71,9 @@ ArgumentList *abc_create_argument(Expression *expr) {
 ArgumentList *abc_chain_argument(ArgumentList *arg_list, Expression *expr) {
     ArgumentList *arg, *p;
     arg = abc_create_argument(expr);
+    if (arg_list == NULL) {
+        return arg;
+    }
     for (p = arg_list; p->next; p = p->next);
     p->next = arg;
     return arg_list;
@@ -91,6 +98,28 @@ StatementList *abc_chain_statement_list(StatementList *sl, Statement *stmt) {
     for (p = sl; p->next != NULL; p = p->next);
     p->next = abc_create_statement_list(stmt);
     return sl;
+}
+
+ExpressionList *abc_create_expression_list(Expression *expr) {
+    ExpressionList *ep;
+
+    ep = abc_storage_malloc(sizeof(ExpressionList));
+    ep->expr = expr;
+    ep->next = NULL;
+
+    return ep;
+}
+
+ExpressionList *abc_chain_expression_list(ExpressionList *el, Expression *expr) {
+    ExpressionList *ep, *p;
+
+    ep = abc_create_expression_list(expr);
+    if (el == NULL) {
+        return ep;
+    }
+    for (p = el; p->next != NULL; p = p->next);
+    p->next = ep;
+    return el;
 }
 
 /*IdentifierList *abc_create_global_identifier(char *identifier) {
@@ -169,7 +198,7 @@ Expression *abc_create_index_expression(Expression *arr_expr, Expression *idx_ex
     expr = create_expression(INDEX_EXPRESSION);
     expr->u.index_expr.array = arr_expr;
     expr->u.index_expr.idx = idx_expr;
-
+    printf("intex\n");
     return expr;
 }
 
@@ -238,6 +267,14 @@ Expression *abc_create_string_expression(ABC_Char *str) {
     return expr;
 }
 
+Expression *abc_create_array_expression(ExpressionList *list) {
+    Expression *expr;
+
+    expr = create_expression(ARRAY_EXPRESSION);
+    expr->u.array_expr = list;
+    return expr;
+}
+
 static Statement *create_statement(StatementType type) {
     Statement *stmt;
 
@@ -292,7 +329,6 @@ Statement *abc_create_if_statement(Expression *if_cond,  Block *if_block,
 Statement *abc_create_for_statement(Expression *init, Expression *cond,
                          Expression *post, Block *block) {
     Statement *stmt;
-
     stmt = create_statement(FOR_STATEMENT);
     stmt->u.for_stat.init = init;
     stmt->u.for_stat.cond = cond;

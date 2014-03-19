@@ -103,6 +103,8 @@ typedef enum {
     GLOBAL_VARIABLE_CONTRADICT_ERR,
     ARGUMENT_TOO_MANY_ERR,
     ARGUMENT_TOO_FEW_ERR,
+    INVALID_LVALUE_ERR,
+    INVALID_INCR_OR_DECR_OPERATOR_ERR,
     ASSIGN_EXPRESSION_ERR,
     BAD_OPERATOR_FOR_STRING_ERR,
     NULL_OPERATOR_ERR,
@@ -111,7 +113,10 @@ typedef enum {
     INCR_OPERATOR_ERR,
     DIV_ZERO_ERR,
     NOT_BOOLEAN_TYPE_ERR,
-    BAD_CHARACTER_ERR
+    BAD_CHARACTER_ERR,
+    INFINITE_WHILE_LOOP_ERR,
+    INVALID_ARRAY_EXPRESSION_ERR,
+    ARRAY_INDEX_OUT_OF_RANGE
 } RuntimeErrorType;
 
 typedef enum {
@@ -189,8 +194,8 @@ struct Expression_tag {
         double                  double_val;
         ABC_Bool                bool_val;
         ABC_Char                *string_val;              
-        ABC_Array               *array_val;
 
+        ExpressionList          *array_expr;
         AssignExpression        assign_expr;
         Expression              *singular_expr;
         BinaryExpression        binary_expr;
@@ -300,7 +305,7 @@ typedef struct VariableList_tag {
     char                *identifier;
     ABC_Value           value;
     struct VariableList_tag *next;
-} VariableList ;
+} VariableList;
 
 struct ParameterList_tag {
     char                *identifier;
@@ -333,8 +338,14 @@ typedef struct FunctionDefinition_tag{
     struct FunctionDefinition_tag *next;
 } FunctionDefinition;
 
+typedef struct RefInNativeFunc_tag {
+    ABC_Object  *object;
+    struct RefInNativeFunc_tag *next;
+} RefInNativeFunc;
+
 struct LocalEnvironment_tag {
     VariableList        *local_variable;
+    RefInNativeFunc     *ref_in_native_func;
     LocalEnvironment    *next;
 };
 
@@ -381,6 +392,8 @@ StatementResult abc_execute_statement_list(LocalEnvironment *env, StatementList 
 /* heap.c */
 void abc_garbage_collect();
 ABC_Object *abc_create_string(ABC_Char *str);
+ABC_Object *abc_create_array_safe(int size);
+ABC_Object *abc_create_array(LocalEnvironment *env, int size);
 ABC_Object *abc_create_string_literal(ABC_Char *str);
 ABC_Object *abc_literal_to_object_string(ABC_Char *str);
 
@@ -398,6 +411,8 @@ ParameterList *abc_chain_parameter(ParameterList *list,
                                    char *identifier);
 ArgumentList *abc_create_argument(Expression *expression);
 ArgumentList *abc_chain_argument(ArgumentList *list, Expression *expr);
+ExpressionList *abc_create_expression_list(Expression *expr);
+ExpressionList *abc_chain_expression_list(ExpressionList *list, Expression *expr);
 Block *abc_create_block(StatementList *statement_list);
 
 Expression *abc_create_expression(ExpressionType type);
@@ -417,6 +432,7 @@ Expression *abc_create_double_expression(double val);
 Expression *abc_create_string_expression(ABC_Char *str);
 Expression *abc_create_boolean_expression(ABC_Bool value);
 Expression *abc_create_null_expression(void);
+Expression *abc_create_array_expression(ExpressionList *list);
 
 StatementList *abc_create_statement_list(Statement *statement);
 StatementList *abc_chain_statement_list(StatementList *list,
@@ -459,6 +475,8 @@ ABC_Value abc_sys_fgets_proc(LocalEnvironment *env,
         int arg_count, ABC_Value *args, int line_num);
 ABC_Value abc_sys_fputs_proc(LocalEnvironment *env,
                   int arg_count, ABC_Value *args, int line_num);
+ABC_Value abc_new_array_proc(LocalEnvironment *env, 
+            int arg_count, ABC_Value *args, int line_num);
 void abc_add_std_fp();
 
 /* string.c */

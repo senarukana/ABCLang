@@ -46,40 +46,39 @@
      FUNCTION = 262,
      IF = 263,
      ELSE = 264,
-     ELSEIF = 265,
-     WHILE = 266,
-     FOR = 267,
-     RETURN = 268,
-     BREAK = 269,
-     CONTINUE = 270,
-     NULL_T = 271,
-     INCR = 272,
-     DECR = 273,
-     LP = 274,
-     RP = 275,
-     LB = 276,
-     RB = 277,
-     LC = 278,
-     RC = 279,
-     DOT = 280,
-     SEMICOLON = 281,
-     COMMA = 282,
-     ASSIGN = 283,
-     LOGICAL_AND = 284,
-     LOGICAL_OR = 285,
-     EQ = 286,
-     NE = 287,
-     GT = 288,
-     GE = 289,
-     LT = 290,
-     LE = 291,
-     ADD = 292,
-     SUB = 293,
-     MUL = 294,
-     DIV = 295,
-     MOD = 296,
-     TRUE_T = 297,
-     FALSE_T = 298
+     WHILE = 265,
+     FOR = 266,
+     RETURN = 267,
+     BREAK = 268,
+     CONTINUE = 269,
+     NULL_T = 270,
+     INCR = 271,
+     DECR = 272,
+     LP = 273,
+     RP = 274,
+     LB = 275,
+     RB = 276,
+     LC = 277,
+     RC = 278,
+     DOT = 279,
+     SEMICOLON = 280,
+     COMMA = 281,
+     ASSIGN = 282,
+     LOGICAL_AND = 283,
+     LOGICAL_OR = 284,
+     EQ = 285,
+     NE = 286,
+     GT = 287,
+     GE = 288,
+     LT = 289,
+     LE = 290,
+     ADD = 291,
+     SUB = 292,
+     MUL = 293,
+     DIV = 294,
+     MOD = 295,
+     TRUE_T = 296,
+     FALSE_T = 297
    };
 #endif
 /* Tokens.  */
@@ -90,47 +89,46 @@
 #define FUNCTION 262
 #define IF 263
 #define ELSE 264
-#define ELSEIF 265
-#define WHILE 266
-#define FOR 267
-#define RETURN 268
-#define BREAK 269
-#define CONTINUE 270
-#define NULL_T 271
-#define INCR 272
-#define DECR 273
-#define LP 274
-#define RP 275
-#define LB 276
-#define RB 277
-#define LC 278
-#define RC 279
-#define DOT 280
-#define SEMICOLON 281
-#define COMMA 282
-#define ASSIGN 283
-#define LOGICAL_AND 284
-#define LOGICAL_OR 285
-#define EQ 286
-#define NE 287
-#define GT 288
-#define GE 289
-#define LT 290
-#define LE 291
-#define ADD 292
-#define SUB 293
-#define MUL 294
-#define DIV 295
-#define MOD 296
-#define TRUE_T 297
-#define FALSE_T 298
+#define WHILE 265
+#define FOR 266
+#define RETURN 267
+#define BREAK 268
+#define CONTINUE 269
+#define NULL_T 270
+#define INCR 271
+#define DECR 272
+#define LP 273
+#define RP 274
+#define LB 275
+#define RB 276
+#define LC 277
+#define RC 278
+#define DOT 279
+#define SEMICOLON 280
+#define COMMA 281
+#define ASSIGN 282
+#define LOGICAL_AND 283
+#define LOGICAL_OR 284
+#define EQ 285
+#define NE 286
+#define GT 287
+#define GE 288
+#define LT 289
+#define LE 290
+#define ADD 291
+#define SUB 292
+#define MUL 293
+#define DIV 294
+#define MOD 295
+#define TRUE_T 296
+#define FALSE_T 297
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 7 "abclang.y"
+#line 9 "abclang.y"
 {
     char            *identifier;
     ABC_Char        *string;
@@ -146,7 +144,7 @@ typedef union YYSTYPE
     ElseIfList      *elseif;
 }
 /* Line 1529 of yacc.c.  */
-#line 150 "y.tab.h"
+#line 148 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

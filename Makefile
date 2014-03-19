@@ -8,7 +8,6 @@ CFLAGS = -c -g -Wall -ansi -DDEBUG
 CC=gcc
 
 $(TARGET):$(OBJS)
-	cd ./memory; $(MAKE)
 	$(CC) -o $@ $(OBJS) -lm -ly -ll
 clean:
 	rm -f *.o lex.yy.c y.tab.c y.tab.h *.out *~
