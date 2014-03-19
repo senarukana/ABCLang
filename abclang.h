@@ -1,15 +1,28 @@
 #ifndef ABC_PRIVATE__
 #define ABC_PRIVATE__
 #include <wchar.h>
+#include "./memory/memory.h"
 
 #define HEAP_ALLOC_SIZE     (1024 * 32)
 #define STACK_ALLOC_SIZE    (1024 * 32)
 #define LINE_BUF_SIZE       (256)
 #define HEAP_THRESHOLDSIZE  (1024 * 256)
 
+typedef struct ABC_Value_tag ABC_Value;
+typedef struct ABC_Object_tag ABC_Object;
+typedef struct Expression_tag Expression;
+typedef struct Statement_tag  Statement;
+typedef struct ParameterList_tag ParameterList;
+typedef struct ArgumentList_tag ArgumentList;
+typedef struct StatementList_tag StatementList;
+typedef struct IdentifierList_tag IdentifierList;
+typedef struct LocalEnvironment_tag LocalEnvironment;
+typedef struct ExpressionList_tag ExpressionList;
+typedef struct Block_tag Block;
+typedef struct ABC_Interpreter_tag ABC_Interpreter;
+
 /* Variable Type */
 typedef wchar_t ABC_Char;
-
 typedef enum {
     ABC_False,
     ABC_True
@@ -37,19 +50,19 @@ typedef enum {
     MAP_OBJECT
 } ObjectType;
 
-typedef struct ABC_String {
+typedef struct ABC_String_tag {
     int         is_literal;
     ABC_Char    *str;
-};
+} ABC_String;
 
-typedef struct ABC_Array {
-    int         len;
+typedef struct ABC_Array_tag {
+    int         size;
     int         alloc_size;
     ABC_Value   *array;
-};
+} ABC_Array;
 
-typedef struct ABC_Object_tag {
-    ABC_ValueType   type;
+struct ABC_Object_tag {
+    ObjectType      type;
     int             mark:1;
     union {
         ABC_String  str;
@@ -57,54 +70,57 @@ typedef struct ABC_Object_tag {
     } u;
     struct ABC_Object_tag *prev;
     struct ABC_Object_tag *next;
-} ABC_Object;
+};
 
-typedef struct ABC_Value {
+struct ABC_Value_tag {
     ABC_ValueType type;
     union {
         int         int_val;
         double      double_val;
         ABC_Bool    bool_val;
-        ABC_Pointer *pointer;
+        ABC_Pointer pointer;
         ABC_Object  *object;
     }u;
 };
 
 /* Error */
+typedef struct {
+    char *format;
+} MessageFormat;
+
 typedef enum {
     PARSE_ERR = 1,
     FUNCTION_MULTIPLE_DEFINE_ERR,
+    STATEMENT_TOO_LONG_ERR,
+    INVALID_CHARACTER_ERR
 } CompileErrorType;
 
 typedef enum {
-    VARAIBLE_NOT_FOUND_ERR = 1,
+    VARIABLE_NOT_FOUND_ERR = 1,
     VARIABLE_MULTIPLE_DEFINE_ERR,
     UNCOMPARABLE_EXPRESSION_ERR,
     FUNCTION_NOT_FOUND_ERR,
+    GLOBAL_VARIABLE_CONTRADICT_ERR,
     ARGUMENT_TOO_MANY_ERR,
     ARGUMENT_TOO_FEW_ERR,
     ASSIGN_EXPRESSION_ERR,
     BAD_OPERATOR_FOR_STRING_ERR,
     NULL_OPERATOR_ERR,
-    INVALID_COMPARE_ERR,
+    INCOMPATIBLE_VARIABLE_TYPE_ERR,
     MINUS_OPERATOR_ERR,
     INCR_OPERATOR_ERR,
     DIV_ZERO_ERR,
-    NOT_BOOLEAN_TYPE_ERR
+    NOT_BOOLEAN_TYPE_ERR,
+    BAD_CHARACTER_ERR
 } RuntimeErrorType;
 
 typedef enum {
     UNKNOWN_EXPRESSION_TYPE_ERR = 1,
     UNKNOWN_STATEMENT_TYPE_ERR,
-    UNKNOWN_VALUE_TYPE_ERR,
+    UNKNOWN_VALUE_TYPE_ERR
 } InternalErrorType;
 
 /* Expression Definition */
-typedef struct Expression_tag Expression;
-typedef struct Statement_tag  Statement;
-typedef struct LocalEnvironment_tag LocalEnvironment;
-typedef struct Block_tag Block;
-typedef struct ABC_interpreter_tag ABC_interpreter;
 
 typedef ABC_Value ABC_SystemFuncPorc(LocalEnvironment *env, int arg_count, ABC_Value *args, int line_num); 
 
@@ -129,6 +145,7 @@ typedef enum {
     SUB_EXPRESSION,
     MUL_EXPRESSION,
     DIV_EXPRESSION,
+    MOD_EXPRESSION,
     MINUS_EXPRESSION,
     INCREMENT_EXPRESSION,
     DECREMENT_EXPRESSION,
@@ -163,13 +180,14 @@ typedef struct {
     ArgumentList    *args;
 } MethodCallExpression;
 
-typedef struct Expression_tag {
+struct Expression_tag {
     ExpressionType type;
     int line_num;
     union {
         char                    *identifier;
         int                     int_val;
         double                  double_val;
+        ABC_Bool                bool_val;
         ABC_Char                *string_val;              
         ABC_Array               *array_val;
 
@@ -180,9 +198,15 @@ typedef struct Expression_tag {
         MethodCallExpression    method_call_expr;
         IndexExpression         index_expr;
     } u;
-} Expression;
+};
+
+struct ExpressionList_tag {
+    Expression *expr;
+    struct ExpressionList_tag *next;
+};
 
 typedef enum {
+    EXPRESSION_STATEMENT = 1,
     IF_STATEMENT,
     FOR_STATEMENT,
     WHILE_STATEMENT,
@@ -233,15 +257,15 @@ struct Statement_tag {
     } u;
 };
 
-typedef struct StatementList_tag {
+struct StatementList_tag {
     Statement       *statement;
-    StatementList   *next;
-} StatementList;
+    struct StatementList_tag   *next;
+};
 
-typedef struct IdentifierList_tag {
+struct IdentifierList_tag {
     char *name;
     struct IdentifierList_tag *next;
-} IdentifierList;
+};
 
 struct Block_tag {
     StatementList *statement_list;
@@ -278,27 +302,23 @@ typedef struct VariableList_tag {
     struct VariableList_tag *next;
 } VariableList ;
 
-typedef struct ParameterList_tag {
+struct ParameterList_tag {
     char                *identifier;
-    struct ParameterList *next;
-} ParameterList ;
+    struct ParameterList_tag *next;
+};
 
-typedef struct ArgumentList_tag {
+struct ArgumentList_tag {
     Expression              *expr;
-    struct ArugumentList_tag *next;
-} ArgumentList;
+    struct ArgumentList_tag *next;
+};
 
 typedef enum {
     SYSTEM_FUNCTION,
     USER_FUNCTION
 } FunctionType;
 
-typedef struct {
-    ABC_Object *obj;
-    RefInNativeMethod *next;
-} RefInNativeMethod;
 
-typedef struct {
+typedef struct FunctionDefinition_tag{
     FunctionType type;
     char    *identifier;
     union {
@@ -307,44 +327,68 @@ typedef struct {
             Block           *block;
         } user_function;
         struct {
-            ABC_SystemFuncPorc *proc
+            ABC_SystemFuncPorc *proc;
         } system_function;
     } u;
+    struct FunctionDefinition_tag *next;
 } FunctionDefinition;
 
-typedef struct LocalEnvironment_tag {
+struct LocalEnvironment_tag {
     VariableList        *local_variable;
     LocalEnvironment    *next;
-} LocalEnvironment;
+};
 
-typedef struct ABC_interpreter_tag {
+struct ABC_Interpreter_tag {
     int                 line_num;
+    MEM_Storage         *interpreter_storage;
+    MEM_Storage         *execute_storage;
     Heap                heap;
     Stack               stack;
     LocalEnvironment    *top_environment;
     VariableList        *global_variable;
     StatementList       *statement_list;
     FunctionDefinition  *func_list;
-} ABC_interpreter;
+};
      
 #define abc_is_object(val) \
-    (val->type == ABC_STRING_VALUE || val->type == ABC_ARRAY_VALUE\ 
-        || val->type == ABC_MAP_VALUE)
+    (val->type == ABC_STRING_VALUE || val->type == ABC_ARRAY_VALUE\
+     || val->type == ABC_MAP_VALUE)
 #define abc_is_math_operator(operator) \
   ((operator) == ADD_EXPRESSION || (operator) == SUB_EXPRESSION\
    || (operator) == MUL_EXPRESSION || (operator) == DIV_EXPRESSION\
    || (operator) == MOD_EXPRESSION)
 
 #define abc_is_compare_operator(operator) \
-  ((operator) == EQ_EXPRESSION || (operator) == NE_EXPRESSION\
+  ((operator) == EQUAL_EXPRESSION || (operator) == NOT_EQUAL_EXPRESSION\
    || (operator) == GT_EXPRESSION || (operator) == GE_EXPRESSION\
    || (operator) == LT_EXPRESSION || (operator) == LE_EXPRESSION)
 
 #define abc_is_logical_operator(operator) \
   ((operator) == LOGICAL_AND_EXPRESSION || (operator) == LOGICAL_OR_EXPRESSION)   
-/* ablang.c */
-ABC_interpreter *abc_get_interpreter();
+/* abc.c */
+ABC_Interpreter *abc_get_interpreter();
 int abc_get_line_number();
+ABC_Interpreter *ABC_create_interpreter();
+void ABC_compile(ABC_Interpreter *inter, FILE *fp);
+void ABC_execute(ABC_Interpreter *inter);
+
+/* eval.c */
+ABC_Value abc_eval_expression(LocalEnvironment *env, Expression *expr);
+
+/* execute.c */
+StatementResult abc_execute_statement_list(LocalEnvironment *env, StatementList *list);
+
+/* heap.c */
+void abc_garbage_collect();
+ABC_Object *abc_create_string(ABC_Char *str);
+ABC_Object *abc_create_string_literal(ABC_Char *str);
+ABC_Object *abc_literal_to_object_string(ABC_Char *str);
+
+/* stack.c */
+void abc_stack_push_value(ABC_Value *value);
+ABC_Value abc_stack_pop_value();
+void abc_stack_shrink(int num);
+ABC_Value *abc_stack_peek(int idx);
 
 /* create.c */
 void abc_create_function(char *identifier, ParameterList *parameter_list,
@@ -352,14 +396,12 @@ void abc_create_function(char *identifier, ParameterList *parameter_list,
 ParameterList *abc_create_parameter(char *identifier);
 ParameterList *abc_chain_parameter(ParameterList *list,
                                    char *identifier);
-ArgumentList *abc_create_argument_list(Expression *expression);
-ArgumentList *abc_chain_argument_list(ArgumentList *list, Expression *expr);
-StatementList *abc_create_statement_list(Statement *statement);
-StatementList *abc_chain_statement_list(StatementList *list,
-                                        Statement *statement);
+ArgumentList *abc_create_argument(Expression *expression);
+ArgumentList *abc_chain_argument(ArgumentList *list, Expression *expr);
+Block *abc_create_block(StatementList *statement_list);
+
 Expression *abc_create_expression(ExpressionType type);
-Expression *abc_create_assign_expression(char *variable,
-                                             Expression *operand);
+Expression *abc_create_assign_expression(Expression *left, Expression *right);
 Expression *abc_create_binary_expression(ExpressionType type,
                                          Expression *left,
                                          Expression *right);
@@ -367,30 +409,84 @@ Expression *abc_create_singular_expression(ExpressionType type, Expression *oper
 Expression *abc_create_identifier_expression(char *identifier);
 Expression *abc_create_function_call_expression(char *func_name,
                                                 ArgumentList *argument);
-Expression *abc_create_boolean_expression(abc_Boolean value);
+Expression *abc_create_method_call_expression(Expression *expression, 
+                char *identifier, ArgumentList *args); 
+Expression *abc_create_index_expression(Expression *arr_expr, Expression *idx_expr);
+Expression *abc_create_int_expression(int val);
+Expression *abc_create_double_expression(double val);
+Expression *abc_create_string_expression(ABC_Char *str);
+Expression *abc_create_boolean_expression(ABC_Bool value);
 Expression *abc_create_null_expression(void);
-Statement *abc_create_global_statement(IdentifierList *identifier_list);
-IdentifierList *abc_create_global_identifier(char *identifier);
-IdentifierList *abc_chain_identifier(IdentifierList *list, char *identifier);
+
+StatementList *abc_create_statement_list(Statement *statement);
+StatementList *abc_chain_statement_list(StatementList *list,
+                                        Statement *statement);
 Statement *abc_create_if_statement(Expression *condition,
                                     Block *then_block, ElseIfList *elsif_list,
                                     Block *else_block);
-ElseIfList *abc_chain_elseif(ElseIfList *list, ElseIfList *add);
+ElseIfList *abc_chain_elseif(ElseIfList *list, ElseIfList *elseif);
 ElseIfList *abc_create_elseif(Expression *expr, Block *block);
 Statement *abc_create_while_statement(Expression *condition, Block *block);
 Statement *abc_create_for_statement(Expression *init, Expression *cond,
                                     Expression *post, Block *block);
-Block *abc_create_block(StatementList *statement_list);
 Statement *abc_create_expression_statement(Expression *expression);
 Statement *abc_create_return_statement(Expression *expression);
 Statement *abc_create_break_statement(void);
 Statement *abc_create_continue_statement(void);
 
+/* util.c */
+void abc_add_global_variable(char *identifier, ABC_Value *value);
+void abc_add_local_variable(LocalEnvironment *env, char *identifier, ABC_Value *value);
+
+/* memory.c */
+void *abc_storage_malloc(size_t size);
+void *abc_execute_malloc(size_t size);
+
+/* native.c */
+ABC_Value abc_sys_print_proc(LocalEnvironment *env, 
+                int arg_count, ABC_Value *args, int line_num);
+ABC_Value abc_sys_println_proc(LocalEnvironment *env, 
+                int arg_count, ABC_Value *args, int line_num);
+ABC_Value abc_sys_fopen_proc(LocalEnvironment *env,
+            int arg_count, ABC_Value *args, int line_num);
+ABC_Value abc_sys_fclose_proc(LocalEnvironment *env,
+            int arg_count, ABC_Value *args, int line_num);
+/*ABC_Value abc_sys_fread_proc(LocalEnvironment *env,
+            int arg_count, ABC_Value *args, int line_num);
+ABC_Value abc_sys_fwrite_proc(LocalEnvironment *env,
+            int arg_count, ABC_Value *args, int line_num);*/
+ABC_Value abc_sys_fgets_proc(LocalEnvironment *env, 
+        int arg_count, ABC_Value *args, int line_num);
+ABC_Value abc_sys_fputs_proc(LocalEnvironment *env,
+                  int arg_count, ABC_Value *args, int line_num);
+void abc_add_std_fp();
+
 /* string.c */
 void abc_string_start();
 void abc_string_add_char(char c);
-char *abc_string_end();
+ABC_Char *abc_string_end();
 char *abc_string_create_identifier(char *str);
+ABC_Char *abc_value_to_string(ABC_Value *value);
 
+/* error.c */
+void abc_compile_error(CompileErrorType type, char *msg);
+void abc_runtime_error(int line_number,RuntimeErrorType type);
+void abc_internal_error(int line_number, InternalErrorType type);
+
+/* wchar.c */
+ABC_Char *abc_wcs_concate(ABC_Char *left, ABC_Char *right);
+int abc_wcs_cmp(ABC_Char *left, ABC_Char *right);
+int abc_wcs_len(ABC_Char *str);
+ABC_Char *abc_wcs_cpy(ABC_Char *dest, ABC_Char *src);
+int abc_wcstombs_len(const ABC_Char *src);
+int abc_wcstombs(const ABC_Char *src, char *dest);
+char *abc_wcstombs_alloc(const ABC_Char *src);
+char *abc_wcsntombs_alloc(const ABC_Char *src, int len);
+int abc_mbstowcs_len(const char *src);
+void abc_mbstowcs(const char *src, ABC_Char *dest);
+void abc_mbsntowcs(const char *src, int len, ABC_Char *dest);
+ABC_Char *abc_mbstowcs_alloc(const char *src);
+int abc_wcs_print(FILE *fp, ABC_Char *str);
+int abc_wcs_println(FILE *fp, ABC_Char *str);
 
 #endif

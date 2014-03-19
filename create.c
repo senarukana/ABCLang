@@ -1,4 +1,5 @@
 #include "abclang.h"
+#include <string.h>
 
 /*
  * Functions to create parser tree, used in yacc
@@ -9,28 +10,28 @@
  */
 
 void abc_create_function(char *identifier, ParameterList *params, Block *block) {
-    FunctionDefinition  *fuc_def, *fp;
+    FunctionDefinition  *func_def, *fp;
     ABC_Interpreter     *inter;
 
     inter = abc_get_interpreter();
 
-    // check if this function is defined
+    /*check if this function is defined*/
     fp = inter->func_list;
-    while(fp->next != NULL) {
-        if (memcmp(fp->identifier, identifier) == 0) {
+    while(fp != NULL) {
+        if (strcmp(fp->identifier, identifier) == 0) {
             break;
         }
     }
-    // found it in func_list
-    if (fp->next != NULL) {
+    /*found it in func_list*/
+    if (fp != NULL) {
         abc_compile_error(FUNCTION_MULTIPLE_DEFINE_ERR, identifier);
     }
 
     func_def = abc_storage_malloc(sizeof(FunctionDefinition));
     func_def->type = USER_FUNCTION;
     func_def->identifier = identifier;
-    func_def->u.params = params;
-    func_def->u.block = block;
+    func_def->u.user_function.params = params;
+    func_def->u.user_function.block = block;
     func_def->next = inter->func_list;
     inter->func_list = func_def;
 }
@@ -50,30 +51,23 @@ ParameterList *abc_chain_parameter(ParameterList *param_list, char *identifier) 
 
     p = param_list;
     param = abc_create_parameter(identifier);
-    while(p->next != NULL) {
-        p = p->next;
-    }
+    for (p = param_list; p->next; p = p->next);
     p->next = param;
     return param_list;
 }
 
 ArgumentList *abc_create_argument(Expression *expr) {
     ArgumentList *arg_list;
-
     arg_list = abc_storage_malloc(sizeof(ArgumentList));
     arg_list->expr = expr;
     arg_list->next = NULL;
     return arg_list;
 }
 
-ArgumentList *abc_chain_argument(ArgumentList *arg_list, char *identifier) {
+ArgumentList *abc_chain_argument(ArgumentList *arg_list, Expression *expr) {
     ArgumentList *arg, *p;
-
-    arg = abc_create_argument(identifier);
-    p = arg_list;
-    while(p->next != NULL) {
-        p = p->next;
-    }
+    arg = abc_create_argument(expr);
+    for (p = arg_list; p->next; p = p->next);
     p->next = arg;
     return arg_list;
 }
@@ -89,56 +83,54 @@ StatementList *abc_create_statement_list(Statement *stmt) {
 }
 
 StatementList *abc_chain_statement_list(StatementList *sl, Statement *stmt) {
-    Statement *p;
+    StatementList *p;
+    if (sl == NULL) {
+        return abc_create_statement_list(stmt);
+    }
 
-    p = sl;
+    for (p = sl; p->next != NULL; p = p->next);
+    p->next = abc_create_statement_list(stmt);
+    return sl;
+}
+
+/*IdentifierList *abc_create_global_identifier(char *identifier) {
+    IdentifierList *identifier;
+
+    identifier = abc_storage_malloc(sizeof(IdentifierList));
+    identifier->name = identifier;
+    identifier->next = NULL;
+
+    return identifier;
+}
+
+IdentifierList *abc_chain_global_identifier(IdentifierList *list, char *identifier) {
+    IdentifierList *identifier, *p;
+
+    identifier = abc_create_global_identifier(identifier);
+    p = list;
     while(p->next != NULL) {
         p = p->next;
     }
-    p->next = abc_create_statement_list(stmt);
-
-    return sl;
-
-}
-
-// IdentifierList *abc_create_global_identifier(char *identifier) {
-//     IdentifierList *identifier;
-
-//     identifier = abc_storage_malloc(sizeof(IdentifierList));
-//     identifier->name = identifier;
-//     identifier->next = NULL;
-
-//     return identifier;
-// }
-
-// IdentifierList *abc_chain_global_identifier(IdentifierList *list, char *identifier) {
-//     IdentifierList *identifier, *p;
-
-//     identifier = abc_create_global_identifier(identifier);
-//     p = list;
-//     while(p->next != NULL) {
-//         p = p->next;
-//     }
-//     p->next = identifier;
-//     return list;
-// }
+    p->next = identifier;
+    return list;
+}*/
 
 static Expression *create_expression(ExpressionType type) {
-    Expression *expression;
+    Expression *expr;
 
-    expression = abc_storage_malloc(sizeof(Expression));
-    expression.type = type;
-    expression.line_num = abc_get_line_number();
+    expr = abc_storage_malloc(sizeof(Expression));
+    expr->type = type;
+    expr->line_num = abc_get_line_number();
 
-    return expression;
+    return expr;
 }
 
-Expression *abc_create_assign_expression(char *identifier, Expression *expr) {
+Expression *abc_create_assign_expression(Expression *left, Expression *right) {
     Expression *expr;
 
     expr = create_expression(ASSIGN_EXPRESSION);
-    expr->u.assign_expr.identifier = identifier;
-    expr->u.assign_expr.expression = expr;
+    expr->u.assign_expr.left = left;
+    expr->u.assign_expr.right = right;
 
     return expr;
 }
@@ -147,7 +139,7 @@ Expression *abc_create_singular_expression(ExpressionType type, Expression *expr
     Expression *expr;
 
     expr = create_expression(type);
-    expr->u.singular_expression = expression;
+    expr->u.singular_expr = expression;
 
     return expr;
 }
@@ -165,10 +157,9 @@ Expression *abc_create_function_call_expression(char *identifier,
             ArgumentList *args) {
     Expression *expr;
 
-    expr = create_expression(FUNCION_CALL_EXPRESSION);
+    expr = create_expression(FUNCTION_CALL_EXPRESSION);
     expr->u.func_expr.identifier = identifier;
     expr->u.func_expr.args = args;
-
     return expr;
 }
 
@@ -182,7 +173,7 @@ Expression *abc_create_index_expression(Expression *arr_expr, Expression *idx_ex
     return expr;
 }
 
-Expression *abc_method_call_expression(Expression *expression, char *identifier, ArgumentList *args) {
+Expression *abc_create_method_call_expression(Expression *expression, char *identifier, ArgumentList *args) {
     Expression *expr;
 
     expr = create_expression(METHOD_CALL_EXPRESSION);
@@ -199,10 +190,10 @@ Expression *abc_create_identifier_expression(char *identifier) {
     expr = create_expression(IDENTIFIER_EXPRESSION);
     expr->u.identifier = identifier;
 
-    return exp;
+    return expr;
 }
 
-Expression *abc_create_boolean_expression(abc_Boolean val) {
+Expression *abc_create_boolean_expression(ABC_Bool val) {
     Expression *expr;
 
     expr = create_expression(BOOLEAN_EXPRESSION);
@@ -238,11 +229,11 @@ Expression *abc_create_double_expression(double val) {
     return expr;
 }
 
-Expression *abc_create_string_expression(char *str) {
+Expression *abc_create_string_expression(ABC_Char *str) {
     Expression *expr;
 
     expr = create_expression(STRING_EXPRESSION);
-    expr->u.string_val = val;
+    expr->u.string_val = str;
 
     return expr;
 }
@@ -257,14 +248,14 @@ static Statement *create_statement(StatementType type) {
     return stmt;
 }
 
-Statement *abc_create_global_statement(IdentifierList *list) {
+/*Statement *abc_create_global_statement(IdentifierList *list) {
     Statement *stmt;
 
     stmt = create_statement(GLOBAL_STATEMENT);
     stmt->u.identifier_list = list;
 
     return stmt;  
-}
+}*/
 
 ElseIfList *abc_create_elseif(Expression *cond, Block *block) {
     ElseIfList *elseif_list;
@@ -276,14 +267,10 @@ ElseIfList *abc_create_elseif(Expression *cond, Block *block) {
     return elseif_list;
 }
 
-ElseIfList *abc_chain_elseif(ElseIfList *list, Expression *cond, Block *block) {
-    ElseIfList *elseif, *p;
+ElseIfList *abc_chain_elseif(ElseIfList *list, ElseIfList *elseif) {
+    ElseIfList *p;
 
-    elseif = abc_create_elseif(cond, block);
-    p = list;
-    while (p->next != NULL) {
-        p = p->next;
-    }
+    for (p = list; p->next; p = p->next);
     p->next = elseif;
 
     return list; 
@@ -302,7 +289,7 @@ Statement *abc_create_if_statement(Expression *if_cond,  Block *if_block,
     return stmt;
 }
 
-Statement abc_create_for_statement(Expression *init, Expression *cond,
+Statement *abc_create_for_statement(Expression *init, Expression *cond,
                          Expression *post, Block *block) {
     Statement *stmt;
 
@@ -324,10 +311,10 @@ Block *abc_create_block(StatementList *statement_list) {
     return block;
 }
 
-Statement abc_create_while_statement(Expression *cond, Block *block) {
+Statement *abc_create_while_statement(Expression *cond, Block *block) {
     Statement *stmt;
 
-    stmt = create_statement(WHILE_STATMENT);
+    stmt = create_statement(WHILE_STATEMENT);
     stmt->u.while_stat.cond = cond;
     stmt->u.while_stat.block = block;
 
@@ -339,7 +326,7 @@ Statement *abc_create_expression_statement(Expression *expression){
 
     st = create_statement(EXPRESSION_STATEMENT);
     st->u.expr_stat = expression;
-
+    fprintf(stderr, "expression statement\n");
     return st;
 }
 
@@ -347,7 +334,7 @@ Statement *abc_create_return_statement(Expression *expression) {
     Statement *st;
 
     st = create_statement(RETURN_STATEMENT);
-    st->u.return_stat.value= expression;
+    st->u.return_stat.expr = expression;
 
     return st;
 }

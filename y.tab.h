@@ -49,7 +49,7 @@
      ELSEIF = 265,
      WHILE = 266,
      FOR = 267,
-     RETURN_T = 268,
+     RETURN = 268,
      BREAK = 269,
      CONTINUE = 270,
      NULL_T = 271,
@@ -93,7 +93,7 @@
 #define ELSEIF 265
 #define WHILE 266
 #define FOR 267
-#define RETURN_T 268
+#define RETURN 268
 #define BREAK 269
 #define CONTINUE 270
 #define NULL_T 271
@@ -130,20 +130,20 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 6 "abclang.y"
+#line 7 "abclang.y"
 {
     char            *identifier;
-    char            *string_val;
+    ABC_Char        *string;
     int             int_val;
     double          double_val;
     Expression      *expression;
     ArgumentList    *arg_list;
     ParameterList   *param_list;
     ExpressionList  *expression_list;
-    IdentifierList  *identifier_list;
     Statement       *statement;
     StatementList   *statement_list;
     Block           *block;
+    ElseIfList      *elseif;
 }
 /* Line 1529 of yacc.c.  */
 #line 150 "y.tab.h"

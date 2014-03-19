@@ -1,19 +1,17 @@
-#include "../memory.h"
+#include "abclang.h"
 
 void *abc_storage_malloc(size_t size) {
-    void *p;
-    ABC_Intepreter *inter;
+    ABC_Interpreter *inter;
 
     inter = abc_get_interpreter();
-    p = MEM_storage_malloc(inter->interpreter_storage, size);
 
-    return p;
+    return MEM_storage_malloc(inter->interpreter_storage, size);
 }
 
-void *abc_excute_malloc(size_t size) {
-    return MEM_malloc(size);
-}
+void *abc_execute_malloc(size_t size) {
+    ABC_Interpreter *inter;
 
-void *abc_execute_realloc(void *ptr, size_t size) {
-    return MEM_realloc(ptr, size);
+    inter = abc_get_interpreter();
+    
+    return MEM_storage_malloc(inter->execute_storage, size);
 }

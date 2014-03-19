@@ -1,11 +1,18 @@
 #include "abclang.h"
 
+
+/*
+ * Use Heap to manage the Objects.
+ * All the objects are chained in the heap.
+ * Use mark-sweep to manage them.
+ *
+ */
+
 static void check_gc() {
-    ABC_Intepreter *inter;
+    ABC_Interpreter *inter;
 
     inter = abc_get_interpreter();
-    // check if the heap is big enough
-    if (inter->heap.current_heap_size + size > inter->heap.threshold_size) {
+    if (inter->heap.current_heap_size > inter->heap.threshold_size) {
         fprintf(stderr,"begin garbage collect, current size is %d\n", inter->heap.current_heap_size);
         abc_garbage_collect();
         fprintf(stderr,"end garbage collect, current size is %d\n", inter->heap.current_heap_size);
@@ -15,13 +22,15 @@ static void check_gc() {
 
 static ABC_Object *alloc_object(ObjectType type) {
     ABC_Object *obj;
+    ABC_Interpreter *inter;
 
     check_gc();
-    obj = abc_execute_malloc(sizeof(ABC_Object));
+    inter = abc_get_interpreter();
+    obj = MEM_malloc(sizeof(ABC_Object));
     obj->type = type;
     obj->prev = NULL;
-    obj->next = abc_get_interpreter()->heap.top;
-    abc_get_interpreter()->heap.top = obj;
+    obj->next = inter->heap.front;
+    inter->heap.front = obj;
     if (obj->next) {
         obj->next->prev = obj;
     }
@@ -35,7 +44,7 @@ ABC_Object *abc_literal_to_object_string(ABC_Char *str) {
 
     inter = abc_get_interpreter();
     obj = alloc_object(STRING_OBJECT);
-    obj->str.str = str;
+    obj->u.str.str = str;
     obj->u.str.is_literal = ABC_False;
     inter->heap.current_heap_size += sizeof(ABC_Char) * (abc_wcs_len(str) +1);
 
@@ -65,17 +74,22 @@ ABC_Object *abc_create_string(ABC_Char *str) {
     return obj;
 }
 
-static void dispose_object(ABC_Interpreter *inter, ABC_Object *obj) {
+static void dispose_object(ABC_Object *obj) {
+    ABC_Interpreter *inter;
+
+    inter = abc_get_interpreter();
     switch(obj->type) {
     case ARRAY_OBJECT:
-
+        fprintf(stderr,"dispose array\n");
+        break;
     case STRING_OBJECT:
         if (!obj->u.str.is_literal) {
             inter->heap.current_heap_size -= sizeof(ABC_Char) * abc_wcs_len(obj->u.str.str);
             free(obj->u.str.str);
         }
+        break;
     default:
-        abc_runtime_error();
+        abc_internal_error(-1, UNKNOWN_VALUE_TYPE_ERR);
     }
     inter->heap.current_heap_size -= sizeof(ABC_Object);
     free(obj);
@@ -87,15 +101,15 @@ static void gc_sweep() {
 
     inter = abc_get_interpreter();
 
-    obj = inter->heap.front();
+    obj = inter->heap.front;
 
-    while (obj->next != NULL) {
-        if (!obj->object->mark) {
+    while (obj != NULL) {
+        if (!obj->mark) {
             tmp = obj->next;
             if (obj->prev) {
                 obj->prev->next = obj->next;
             } else {
-                inter->heap.top = tmp;
+                inter->heap.front = tmp;
             }
             if (obj->next) {
                 obj->next->prev = obj->prev;
@@ -111,41 +125,41 @@ static void gc_sweep() {
 static void gc_mark() {
     ABC_Interpreter     *inter;
     LocalEnvironment    *lp;
-    VariabeleList       *vp;
+    VariableList       *vp;
     ABC_Value           *val;
     ABC_Object          *obj;
     int i;
 
     inter = abc_get_interpreter();
 
-    // reset mark
-    for (obj = inter->heap.header; obj; obj = obj->next) {
+    /*reset mark*/
+    for (obj = inter->heap.front; obj; obj = obj->next) {
         obj->mark = ABC_False;
     }
 
-    // global variable
+    /*global variable*/
     for (vp = inter->global_variable; vp; vp = vp->next) {
         val = &vp->value;
         if (abc_is_object(val)) {
-            val->object->mark = ABC_True;
+            val->u.object->mark = ABC_True;
         }
     }
 
-    // local variable
+    /*local variable*/
     for (lp = inter->top_environment; lp; lp = lp->next) {
-        for (vp = lp->variable_list; vp; vp = vp->next) {
+        for (vp = lp->local_variable; vp; vp = vp->next) {
             val = &vp->value;
             if (abc_is_object(val)) {
-                val->object->mark = ABC_True;
+                val->u.object->mark = ABC_True;
             }
         }
     }
 
-    // stack variable
+    /*stack variable*/
     for (i = 0; i < inter->stack.pos; i++) {
-        val = inter->stack.top[i];
-        if (abc_is_object(ABC_OBJECT_VALUE)) {
-            val->object->mark = ABC_True;
+        val = &inter->stack.top[i];
+        if (abc_is_object(val)) {
+            val->u.object->mark = ABC_True;
         }
     }
 }

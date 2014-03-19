@@ -82,7 +82,6 @@ void *MEM_storage_malloc_func(MEM_Controller *controller, MEM_Storage *storage,
         char *filename, int line, size_t size) {
     MemoryPage  *new_page, *page;
     void *p;
-    int i, page_num;
 
     if (size > storage->page_size) {
         error_handler(controller, filename, line, "Request Memoery Too Big");
@@ -117,7 +116,7 @@ void *MEM_storage_malloc_func(MEM_Controller *controller, MEM_Storage *storage,
 void MEM_dispose_storage_func(MEM_Controller *controller, MEM_Storage *storage) {
     MemoryPage *page;
     while (storage->page_list) {
-        page = storage->page_list;
+        page = storage->page_list->next;
         free(storage->page_list);
         storage->page_list = page;
     }

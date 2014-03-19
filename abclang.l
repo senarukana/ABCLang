@@ -1,14 +1,14 @@
 %{
 #include <stdio.h>
-#include "y.tab.h"
 #include "abclang.h"
+#include "y.tab.h"
 
 int yywrap() {
     return 1;
 }
 
 static void increment_line_number() {
-    abc_get_intrepreter()->line_number++;
+    abc_get_interpreter()->line_num++;
 }
 %}
 
@@ -74,13 +74,16 @@ static void increment_line_number() {
 
 <INITIAL>[ \t] ;
 <INITIAL>\n { increment_line_number(); }
-<INITIAL>. {
-    /* error */
-}
-<INITIAL>#  BEGIN COMMENT_STATE
+<INITIAL>#  BEGIN COMMENT_STATE;
+
 <INITIAL>\" {
     abc_string_start();
     BEGIN STRING_STATE;
+}
+
+<INITIAL>. {
+    /* error */
+    abc_compile_error(PARSE_ERR, "invalid syntax");
 }
 
 <COMMENT_STATE>\n  { 
@@ -92,15 +95,15 @@ static void increment_line_number() {
     abc_string_add_char('\n');
     increment_line_number();
 }
-<STRING_STATE> \" {
-    char *str = abc_string_end();
-    yylval.str_val = str;
+<STRING_STATE>\" {
+    ABC_Char *str = abc_string_end();
+    yylval.string = str;
     BEGIN INITIAL;
     return STRING_LITERAL;
 }
-<STRING_LITERAL_STATE>\\\"      abc_string_add_char('"');
-<STRING_LITERAL_STATE>\\n       abc_string_add_char('\n');
-<STRING_LITERAL_STATE>\\t       abc_string_add_char('\t');
-<STRING_LITERAL_STATE>\\\\      abc_string_add_char('\\');
-<STRING_LITERAL_STATE>.         abc_string_add_char(yytext[0]);
+<STRING_STATE>\\\"      abc_string_add_char('"');
+<STRING_STATE>\\n       abc_string_add_char('\n');
+<STRING_STATE>\\t       abc_string_add_char('\t');
+<STRING_STATE>\\\\      abc_string_add_char('\\');
+<STRING_STATE>.         abc_string_add_char(yytext[0]);
 %%

@@ -1,2 +1,12 @@
 a = 10;
-print(a);
+b = 20;
+c = a+b;
+d = 10.5;
+if a < 10 {
+    println("no");
+} else if a== 10 {
+    println("okay");
+} else {
+    println("bad");
+}
+print(d*c);

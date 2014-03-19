@@ -1,11 +1,12 @@
 %{
 #include <stdio.h>
-#include "abclang.h"   
-%}
+#include "abclang.h"
+#define YYDEBUG 1
+%}  
 
 %union {
     char            *identifier;
-    char            *string_val;
+    ABC_Char        *string;
     int             int_val;
     double          double_val;
     Expression      *expression;
@@ -15,14 +16,15 @@
     Statement       *statement;
     StatementList   *statement_list;
     Block           *block;
+    ElseIfList      *elseif;
 }
 
 %token <int_val>        INT_LITERAL
 %token <double_val>     DOUBLE_LITERAL
-%token <string_val>     STRING_LITERAL
-%token <identifier>      IDENTIFIER
+%token <string>     STRING_LITERAL
+%token <identifier>     IDENTIFIER
 
-%token FUNCTION IF ELSE ELSEIF WHILE FOR RETURN_T BREAK CONTINUE NULL_T INCR DECR
+%token FUNCTION IF ELSE ELSEIF WHILE FOR RETURN BREAK CONTINUE NULL_T INCR DECR
         LP RP LB RB LC RC DOT SEMICOLON COMMA  
         ASSIGN LOGICAL_AND LOGICAL_OR
         EQ NE GT GE LT LE ADD SUB MUL DIV MOD TRUE_T FALSE_T
@@ -40,7 +42,6 @@
 %type   <statement_list> statement_list
 %type   <block> block
 %type   <elseif> elseif elseif_list
-
 %%
 translation_unit:
         def_or_statement
@@ -52,6 +53,7 @@ def_or_statement:
             ABC_Interpreter *inter = abc_get_interpreter();
             inter->statement_list = abc_chain_statement_list(
                 inter->statement_list, $1);
+            fprintf(stderr,"ok!\n");
         }
     ;
 function_def:
@@ -90,7 +92,7 @@ block:
 
 statement_list: 
         statement {
-            $$ = abc_create_statment_list($1);
+            $$ = abc_create_statement_list($1);
         }
     |   statement_list statement {
             $$ = abc_chain_statement_list($1, $2);
@@ -115,7 +117,7 @@ if_statement:
             $$ = abc_create_if_statement($2, $3, NULL, NULL);    
         }
     |   IF expression block ELSE block {
-            $$ = abc_create_if_statement($2, $3, $5);
+            $$ = abc_create_if_statement($2, $3, NULL, $5);
         }
     |   IF expression block elseif_list {
             $$ = abc_create_if_statement($2, $3, $4, NULL);
@@ -146,7 +148,7 @@ while_statement: WHILE expression block {
         $$ = abc_create_while_statement($2, $3); 
     }
     ;
-return_statement: RETURN_T expression SEMICOLON {
+return_statement: RETURN expression SEMICOLON {
         $$ = abc_create_return_statement($2);
     }
     ;
@@ -173,7 +175,7 @@ statement_expression:
     ;
 
 assign_expression:
-       IDENTIFIER ASSIGN expression {
+       expression ASSIGN expression {
             $$ = abc_create_assign_expression($1, $3);
         }
     ;
@@ -189,10 +191,10 @@ method_call_expression:
 
 function_call_expression:
         IDENTIFIER LP argument_list RP {
-            $$ = abc_create_funcion_call_expression($1, $3);
+            $$ = abc_create_function_call_expression($1, $3);
         }
     |   IDENTIFIER LP RP {
-            $$ = abc_create_funcion_call_expression($1, NULL);
+            $$ = abc_create_function_call_expression($1, NULL);
         }
     ;
 
@@ -264,10 +266,10 @@ mul_div_mod_expression:
 incr_decr_expression:
         minus_expression
     |   incr_decr_expression INCR {
-            $$ = abc_create_singular_expression(INCR_EXPRESSION, $1);
+            $$ = abc_create_singular_expression(INCREMENT_EXPRESSION, $1);
         }
     |   incr_decr_expression DECR {
-            $$ = abc_create_singular_expression(DECR_EXPRESSION, $1);
+            $$ = abc_create_singular_expression(DECREMENT_EXPRESSION, $1);
         }
     ;
 
@@ -304,10 +306,10 @@ primary_expression:
             $$ = abc_create_string_expression($1);
         }
     |   TRUE_T {
-            $$ = abc_create_boolean_expression(ABC_TRUE);
+            $$ = abc_create_boolean_expression(ABC_True);
         }
     |   FALSE_T {
-            $$ = abc_create_boolean_expression(ABC_FALSE);
+            $$ = abc_create_boolean_expression(ABC_False);
         }
     |   NULL_T {
             $$ = abc_create_null_expression();

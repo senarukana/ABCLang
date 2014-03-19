@@ -9,7 +9,7 @@
 #define PAGE_HEADER_SIZE            (sizeof(MemoryPage))
 #define DEFAULT_PAGE_SIZE           (1024)
 #define ALLOC_PAGE_SIZE(storage)    (storage->page_size-PAGE_HEADER_SIZE)
-#define MEM_CURRENT_CONTROLLER mem_default_controller
+#define MEM_CURRENT_CONTROLLER      mem_default_controller
 
 typedef struct MEM_Controller_tag MEM_Controller;
 typedef void (*MEM_ErrorHandler)(MEM_Controller *controller,
