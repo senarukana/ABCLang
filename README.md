@@ -41,6 +41,7 @@ C like for:
     }   
   
 easier one:
+
     #slice
     a = {1, 2, 3};
     for i : a {
