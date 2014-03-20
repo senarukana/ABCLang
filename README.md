@@ -1,7 +1,7 @@
 # ABC Language
-ABC ia a typeless, dynamic language like python and ruby. It's just a toy language right now, just like the name suggest :).
+ABC ia a typeless, dynamic language like python and ruby. It's just a toy language right now, just like the name suggests :).
  
-Currently, a large part of codes are borrowed from crowbar language which is  written by the . 
+Currently, a large part of codes are borrowed from crowbar language which is  written by the Kazuya Maebashi. 
 
 ## Installation
 Simply run make and everything is done.
@@ -14,6 +14,10 @@ You can set a environment envariable after making it.
 Create a file name hello.abc, put the following:
 
     println("Hello, world\n");
+
+Save it and run:
+
+    abclang hello.abc
 If you see the "Hello, world" message then your installation is working.
 
 
