@@ -25,3 +25,33 @@ void abc_add_global_variable(char *identifier, ABC_Value *value) {
     new_variable->next = inter->global_variable;
     inter->global_variable = new_variable;
 }
+
+int abc_value_compare(ABC_Value *a, ABC_Value *b) {
+    if (a == NULL || b == NULL) {
+        if (a == NULL && b== NULL) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+    if (a->type != b->type) {
+        return 1;
+    }
+    switch(a->type) {
+    case ABC_INT_VALUE:
+        return a->u.int_val - b->u.int_val;
+        break;
+    case ABC_DOUBLE_VALUE:
+        return a->u.double_val - b->u.double_val;
+    case ABC_BOOLEAN_VALUE:
+        return a->u.bool_val - b->u.bool_val;
+    case ABC_NULL_VALUE:
+        return 0;
+    case ABC_STRING_VALUE:
+        return abc_wcs_cmp(a->u.object->u.str.str, b->u.object->u.str.str);
+    default:
+        abc_internal_error(-1, UNCOMPARABLE_TYPE);
+    }
+    /* make the compiler happy */
+    return 0;
+}

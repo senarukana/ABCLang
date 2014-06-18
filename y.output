@@ -58,71 +58,72 @@ Grammar
 
    37 assign_expression: logical_or_expression
    38                  | postfix_expression ASSIGN expression
+   39                  | postfix_expression ASSIGN array_expression
 
-   39 logical_or_expression: logical_and_expression
-   40                      | logical_or_expression LOGICAL_OR logical_and_expression
+   40 logical_or_expression: logical_and_expression
+   41                      | logical_or_expression LOGICAL_OR logical_and_expression
 
-   41 logical_and_expression: equality_expression
-   42                       | logical_and_expression LOGICAL_AND equality_expression
+   42 logical_and_expression: equality_expression
+   43                       | logical_and_expression LOGICAL_AND equality_expression
 
-   43 equality_expression: relational_expression
-   44                    | equality_expression EQ relational_expression
-   45                    | equality_expression NE relational_expression
+   44 equality_expression: relational_expression
+   45                    | equality_expression EQ relational_expression
+   46                    | equality_expression NE relational_expression
 
-   46 relational_expression: add_sub_expression
-   47                      | relational_expression GT add_sub_expression
-   48                      | relational_expression GE add_sub_expression
-   49                      | relational_expression LT add_sub_expression
-   50                      | relational_expression LE add_sub_expression
+   47 relational_expression: add_sub_expression
+   48                      | relational_expression GT add_sub_expression
+   49                      | relational_expression GE add_sub_expression
+   50                      | relational_expression LT add_sub_expression
+   51                      | relational_expression LE add_sub_expression
 
-   51 add_sub_expression: mul_div_mod_expression
-   52                   | add_sub_expression ADD mul_div_mod_expression
-   53                   | add_sub_expression SUB mul_div_mod_expression
+   52 add_sub_expression: mul_div_mod_expression
+   53                   | add_sub_expression ADD mul_div_mod_expression
+   54                   | add_sub_expression SUB mul_div_mod_expression
 
-   54 mul_div_mod_expression: minus_expression
-   55                       | mul_div_mod_expression MUL minus_expression
-   56                       | mul_div_mod_expression DIV minus_expression
-   57                       | mul_div_mod_expression MOD minus_expression
+   55 mul_div_mod_expression: minus_expression
+   56                       | mul_div_mod_expression MUL minus_expression
+   57                       | mul_div_mod_expression DIV minus_expression
+   58                       | mul_div_mod_expression MOD minus_expression
 
-   58 minus_expression: postfix_expression
-   59                 | SUB postfix_expression
+   59 minus_expression: postfix_expression
+   60                 | SUB postfix_expression
 
-   60 postfix_expression: primary_expression
-   61                   | postfix_expression LB expression RB
-   62                   | postfix_expression DOT IDENTIFIER LP argument_list RP
-   63                   | postfix_expression DOT IDENTIFIER LP RP
-   64                   | postfix_expression INCR
-   65                   | postfix_expression DECR
+   61 postfix_expression: primary_expression
+   62                   | postfix_expression LB expression RB
+   63                   | postfix_expression DOT IDENTIFIER
+   64                   | postfix_expression DOT IDENTIFIER LP argument_list RP
+   65                   | postfix_expression DOT IDENTIFIER LP RP
+   66                   | postfix_expression INCR
+   67                   | postfix_expression DECR
 
-   66 primary_expression: function_call_expression
-   67                   | LP expression RP
-   68                   | IDENTIFIER
-   69                   | INT_LITERAL
-   70                   | DOUBLE_LITERAL
-   71                   | STRING_LITERAL
-   72                   | TRUE_T
-   73                   | FALSE_T
-   74                   | NULL_T
-   75                   | array_expression
+   68 primary_expression: function_call_expression
+   69                   | LP expression RP
+   70                   | IDENTIFIER
+   71                   | INT_LITERAL
+   72                   | DOUBLE_LITERAL
+   73                   | STRING_LITERAL
+   74                   | TRUE_T
+   75                   | FALSE_T
+   76                   | NULL_T
 
-   76 function_call_expression: IDENTIFIER LP argument_list RP
-   77                         | IDENTIFIER LP RP
+   77 function_call_expression: IDENTIFIER LP argument_list RP
+   78                         | IDENTIFIER LP RP
 
-   78 expression_list: /* empty */
-   79                | expression
-   80                | expression_list COMMA expression
+   79 expression_list: /* empty */
+   80                | expression
+   81                | expression_list COMMA expression
 
-   81 array_expression: LC expression_list RC
+   82 array_expression: LB expression_list RB
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-INT_LITERAL (258) 69
-DOUBLE_LITERAL (259) 70
-STRING_LITERAL (260) 71
-IDENTIFIER (261) 5 6 9 10 62 63 68 76 77
+INT_LITERAL (258) 71
+DOUBLE_LITERAL (259) 72
+STRING_LITERAL (260) 73
+IDENTIFIER (261) 5 6 9 10 63 64 65 70 77 78
 FUNCTION (262) 5 6
 IF (263) 22 23 24 25 28
 ELSE (264) 23 25 28
@@ -131,34 +132,34 @@ FOR (266) 29
 RETURN (267) 31
 BREAK (268) 32
 CONTINUE (269) 33
-NULL_T (270) 74
-INCR (271) 64
-DECR (272) 65
-LP (273) 5 6 29 62 63 67 76 77
-RP (274) 5 6 29 62 63 67 76 77
-LB (275) 61
-RB (276) 61
-LC (277) 11 12 81
-RC (278) 11 12 81
-DOT (279) 62 63
+NULL_T (270) 76
+INCR (271) 66
+DECR (272) 67
+LP (273) 5 6 29 64 65 69 77 78
+RP (274) 5 6 29 64 65 69 77 78
+LB (275) 62 82
+RB (276) 62 82
+LC (277) 11 12
+RC (278) 11 12
+DOT (279) 63 64 65
 SEMICOLON (280) 15 29 31 32 33
-COMMA (281) 8 10 80
-ASSIGN (282) 38
-LOGICAL_AND (283) 42
-LOGICAL_OR (284) 40
-EQ (285) 44
-NE (286) 45
-GT (287) 47
-GE (288) 48
-LT (289) 49
-LE (290) 50
-ADD (291) 52
-SUB (292) 53 59
-MUL (293) 55
-DIV (294) 56
-MOD (295) 57
-TRUE_T (296) 72
-FALSE_T (297) 73
+COMMA (281) 8 10 81
+ASSIGN (282) 38 39
+LOGICAL_AND (283) 43
+LOGICAL_OR (284) 41
+EQ (285) 45
+NE (286) 46
+GT (287) 48
+GE (288) 49
+LT (289) 50
+LE (290) 51
+ADD (291) 53
+SUB (292) 54 60
+MUL (293) 56
+DIV (294) 57
+MOD (295) 58
+TRUE_T (296) 74
+FALSE_T (297) 75
 
 
 Nonterminals, with rules where they appear
@@ -172,7 +173,7 @@ def_or_statement (45)
 function_def (46)
     on left: 5 6, on right: 3
 argument_list (47)
-    on left: 7 8, on right: 8 62 76
+    on left: 7 8, on right: 8 64 77
 parameter_list (48)
     on left: 9 10, on right: 5 10
 block (49)
@@ -200,34 +201,35 @@ continue_statement (59)
 expression_opt (60)
     on left: 34 35, on right: 29
 expression (61)
-    on left: 36, on right: 7 8 15 22 23 24 25 28 30 31 35 38 61 67
-    79 80
+    on left: 36, on right: 7 8 15 22 23 24 25 28 30 31 35 38 62 69
+    80 81
 assign_expression (62)
-    on left: 37 38, on right: 36
+    on left: 37 38 39, on right: 36
 logical_or_expression (63)
-    on left: 39 40, on right: 37 40
+    on left: 40 41, on right: 37 41
 logical_and_expression (64)
-    on left: 41 42, on right: 39 40 42
+    on left: 42 43, on right: 40 41 43
 equality_expression (65)
-    on left: 43 44 45, on right: 41 42 44 45
+    on left: 44 45 46, on right: 42 43 45 46
 relational_expression (66)
-    on left: 46 47 48 49 50, on right: 43 44 45 47 48 49 50
+    on left: 47 48 49 50 51, on right: 44 45 46 48 49 50 51
 add_sub_expression (67)
-    on left: 51 52 53, on right: 46 47 48 49 50 52 53
+    on left: 52 53 54, on right: 47 48 49 50 51 53 54
 mul_div_mod_expression (68)
-    on left: 54 55 56 57, on right: 51 52 53 55 56 57
+    on left: 55 56 57 58, on right: 52 53 54 56 57 58
 minus_expression (69)
-    on left: 58 59, on right: 54 55 56 57
+    on left: 59 60, on right: 55 56 57 58
 postfix_expression (70)
-    on left: 60 61 62 63 64 65, on right: 38 58 59 61 62 63 64 65
+    on left: 61 62 63 64 65 66 67, on right: 38 39 59 60 62 63 64 65
+    66 67
 primary_expression (71)
-    on left: 66 67 68 69 70 71 72 73 74 75, on right: 60
+    on left: 68 69 70 71 72 73 74 75 76, on right: 61
 function_call_expression (72)
-    on left: 76 77, on right: 66
+    on left: 77 78, on right: 68
 expression_list (73)
-    on left: 78 79 80, on right: 80 81
+    on left: 79 80 81, on right: 81 82
 array_expression (74)
-    on left: 81, on right: 75
+    on left: 82, on right: 39
 
 
 state 0
@@ -247,66 +249,64 @@ state 0
     CONTINUE        shift, and go to state 11
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    translation_unit          go to state 18
-    def_or_statement          go to state 19
-    function_def              go to state 20
-    statement                 go to state 21
-    if_statement              go to state 22
-    for_statement             go to state 23
-    while_statement           go to state 24
-    return_statement          go to state 25
-    break_statement           go to state 26
-    continue_statement        go to state 27
-    expression                go to state 28
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    translation_unit          go to state 17
+    def_or_statement          go to state 18
+    function_def              go to state 19
+    statement                 go to state 20
+    if_statement              go to state 21
+    for_statement             go to state 22
+    while_statement           go to state 23
+    return_statement          go to state 24
+    break_statement           go to state 25
+    continue_statement        go to state 26
+    expression                go to state 27
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 1
 
-   69 primary_expression: INT_LITERAL .
-
-    $default  reduce using rule 69 (primary_expression)
-
-
-state 2
-
-   70 primary_expression: DOUBLE_LITERAL .
-
-    $default  reduce using rule 70 (primary_expression)
-
-
-state 3
-
-   71 primary_expression: STRING_LITERAL .
+   71 primary_expression: INT_LITERAL .
 
     $default  reduce using rule 71 (primary_expression)
 
 
+state 2
+
+   72 primary_expression: DOUBLE_LITERAL .
+
+    $default  reduce using rule 72 (primary_expression)
+
+
+state 3
+
+   73 primary_expression: STRING_LITERAL .
+
+    $default  reduce using rule 73 (primary_expression)
+
+
 state 4
 
-   68 primary_expression: IDENTIFIER .
-   76 function_call_expression: IDENTIFIER . LP argument_list RP
-   77                         | IDENTIFIER . LP RP
+   70 primary_expression: IDENTIFIER .
+   77 function_call_expression: IDENTIFIER . LP argument_list RP
+   78                         | IDENTIFIER . LP RP
 
-    LP  shift, and go to state 41
+    LP  shift, and go to state 39
 
-    $default  reduce using rule 68 (primary_expression)
+    $default  reduce using rule 70 (primary_expression)
 
 
 state 5
@@ -314,7 +314,7 @@ state 5
     5 function_def: FUNCTION . IDENTIFIER LP parameter_list RP block
     6             | FUNCTION . IDENTIFIER LP RP block
 
-    IDENTIFIER  shift, and go to state 42
+    IDENTIFIER  shift, and go to state 40
 
 
 state 6
@@ -330,24 +330,22 @@ state 6
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    expression                go to state 43
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression                go to state 41
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 7
@@ -360,31 +358,29 @@ state 7
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    expression                go to state 44
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression                go to state 42
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 8
 
    29 for_statement: FOR . LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP block
 
-    LP  shift, and go to state 45
+    LP  shift, and go to state 43
 
 
 state 9
@@ -397,50 +393,48 @@ state 9
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    expression                go to state 46
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression                go to state 44
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 10
 
    32 break_statement: BREAK . SEMICOLON
 
-    SEMICOLON  shift, and go to state 47
+    SEMICOLON  shift, and go to state 45
 
 
 state 11
 
    33 continue_statement: CONTINUE . SEMICOLON
 
-    SEMICOLON  shift, and go to state 48
+    SEMICOLON  shift, and go to state 46
 
 
 state 12
 
-   74 primary_expression: NULL_T .
+   76 primary_expression: NULL_T .
 
-    $default  reduce using rule 74 (primary_expression)
+    $default  reduce using rule 76 (primary_expression)
 
 
 state 13
 
-   67 primary_expression: LP . expression RP
+   69 primary_expression: LP . expression RP
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -448,29 +442,27 @@ state 13
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    expression                go to state 49
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression                go to state 47
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 14
 
-   81 array_expression: LC . expression_list RC
+   60 minus_expression: SUB . postfix_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -478,69 +470,34 @@ state 14
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    $default  reduce using rule 78 (expression_list)
-
-    expression                go to state 50
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    expression_list           go to state 51
-    array_expression          go to state 40
+    postfix_expression        go to state 48
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 15
 
-   59 minus_expression: SUB . postfix_expression
+   74 primary_expression: TRUE_T .
 
-    INT_LITERAL     shift, and go to state 1
-    DOUBLE_LITERAL  shift, and go to state 2
-    STRING_LITERAL  shift, and go to state 3
-    IDENTIFIER      shift, and go to state 4
-    NULL_T          shift, and go to state 12
-    LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
-
-    postfix_expression        go to state 52
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    $default  reduce using rule 74 (primary_expression)
 
 
 state 16
 
-   72 primary_expression: TRUE_T .
+   75 primary_expression: FALSE_T .
 
-    $default  reduce using rule 72 (primary_expression)
+    $default  reduce using rule 75 (primary_expression)
 
 
 state 17
 
-   73 primary_expression: FALSE_T .
-
-    $default  reduce using rule 73 (primary_expression)
-
-
-state 18
-
     0 $accept: translation_unit . $end
     2 translation_unit: translation_unit . def_or_statement
 
-    $end            shift, and go to state 53
+    $end            shift, and go to state 49
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
     STRING_LITERAL  shift, and go to state 3
@@ -554,237 +511,230 @@ state 18
     CONTINUE        shift, and go to state 11
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    def_or_statement          go to state 54
-    function_def              go to state 20
-    statement                 go to state 21
-    if_statement              go to state 22
-    for_statement             go to state 23
-    while_statement           go to state 24
-    return_statement          go to state 25
-    break_statement           go to state 26
-    continue_statement        go to state 27
-    expression                go to state 28
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    def_or_statement          go to state 50
+    function_def              go to state 19
+    statement                 go to state 20
+    if_statement              go to state 21
+    for_statement             go to state 22
+    while_statement           go to state 23
+    return_statement          go to state 24
+    break_statement           go to state 25
+    continue_statement        go to state 26
+    expression                go to state 27
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 19
+state 18
 
     1 translation_unit: def_or_statement .
 
     $default  reduce using rule 1 (translation_unit)
 
 
-state 20
+state 19
 
     3 def_or_statement: function_def .
 
     $default  reduce using rule 3 (def_or_statement)
 
 
-state 21
+state 20
 
     4 def_or_statement: statement .
 
     $default  reduce using rule 4 (def_or_statement)
 
 
-state 22
+state 21
 
    16 statement: if_statement .
 
     $default  reduce using rule 16 (statement)
 
 
-state 23
+state 22
 
    17 statement: for_statement .
 
     $default  reduce using rule 17 (statement)
 
 
-state 24
+state 23
 
    18 statement: while_statement .
 
     $default  reduce using rule 18 (statement)
 
 
-state 25
+state 24
 
    21 statement: return_statement .
 
     $default  reduce using rule 21 (statement)
 
 
-state 26
+state 25
 
    19 statement: break_statement .
 
     $default  reduce using rule 19 (statement)
 
 
-state 27
+state 26
 
    20 statement: continue_statement .
 
     $default  reduce using rule 20 (statement)
 
 
-state 28
+state 27
 
    15 statement: expression . SEMICOLON
 
-    SEMICOLON  shift, and go to state 55
+    SEMICOLON  shift, and go to state 51
 
 
-state 29
+state 28
 
    36 expression: assign_expression .
 
     $default  reduce using rule 36 (expression)
 
 
-state 30
+state 29
 
    37 assign_expression: logical_or_expression .
-   40 logical_or_expression: logical_or_expression . LOGICAL_OR logical_and_expression
+   41 logical_or_expression: logical_or_expression . LOGICAL_OR logical_and_expression
 
-    LOGICAL_OR  shift, and go to state 56
+    LOGICAL_OR  shift, and go to state 52
 
     $default  reduce using rule 37 (assign_expression)
 
 
+state 30
+
+   40 logical_or_expression: logical_and_expression .
+   43 logical_and_expression: logical_and_expression . LOGICAL_AND equality_expression
+
+    LOGICAL_AND  shift, and go to state 53
+
+    $default  reduce using rule 40 (logical_or_expression)
+
+
 state 31
 
-   39 logical_or_expression: logical_and_expression .
-   42 logical_and_expression: logical_and_expression . LOGICAL_AND equality_expression
+   42 logical_and_expression: equality_expression .
+   45 equality_expression: equality_expression . EQ relational_expression
+   46                    | equality_expression . NE relational_expression
 
-    LOGICAL_AND  shift, and go to state 57
+    EQ  shift, and go to state 54
+    NE  shift, and go to state 55
 
-    $default  reduce using rule 39 (logical_or_expression)
+    $default  reduce using rule 42 (logical_and_expression)
 
 
 state 32
 
-   41 logical_and_expression: equality_expression .
-   44 equality_expression: equality_expression . EQ relational_expression
-   45                    | equality_expression . NE relational_expression
+   44 equality_expression: relational_expression .
+   48 relational_expression: relational_expression . GT add_sub_expression
+   49                      | relational_expression . GE add_sub_expression
+   50                      | relational_expression . LT add_sub_expression
+   51                      | relational_expression . LE add_sub_expression
 
-    EQ  shift, and go to state 58
-    NE  shift, and go to state 59
+    GT  shift, and go to state 56
+    GE  shift, and go to state 57
+    LT  shift, and go to state 58
+    LE  shift, and go to state 59
 
-    $default  reduce using rule 41 (logical_and_expression)
+    $default  reduce using rule 44 (equality_expression)
 
 
 state 33
 
-   43 equality_expression: relational_expression .
-   47 relational_expression: relational_expression . GT add_sub_expression
-   48                      | relational_expression . GE add_sub_expression
-   49                      | relational_expression . LT add_sub_expression
-   50                      | relational_expression . LE add_sub_expression
+   47 relational_expression: add_sub_expression .
+   53 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
+   54                   | add_sub_expression . SUB mul_div_mod_expression
 
-    GT  shift, and go to state 60
-    GE  shift, and go to state 61
-    LT  shift, and go to state 62
-    LE  shift, and go to state 63
+    ADD  shift, and go to state 60
+    SUB  shift, and go to state 61
 
-    $default  reduce using rule 43 (equality_expression)
+    $default  reduce using rule 47 (relational_expression)
 
 
 state 34
 
-   46 relational_expression: add_sub_expression .
-   52 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
-   53                   | add_sub_expression . SUB mul_div_mod_expression
+   52 add_sub_expression: mul_div_mod_expression .
+   56 mul_div_mod_expression: mul_div_mod_expression . MUL minus_expression
+   57                       | mul_div_mod_expression . DIV minus_expression
+   58                       | mul_div_mod_expression . MOD minus_expression
 
-    ADD  shift, and go to state 64
-    SUB  shift, and go to state 65
+    MUL  shift, and go to state 62
+    DIV  shift, and go to state 63
+    MOD  shift, and go to state 64
 
-    $default  reduce using rule 46 (relational_expression)
+    $default  reduce using rule 52 (add_sub_expression)
 
 
 state 35
 
-   51 add_sub_expression: mul_div_mod_expression .
-   55 mul_div_mod_expression: mul_div_mod_expression . MUL minus_expression
-   56                       | mul_div_mod_expression . DIV minus_expression
-   57                       | mul_div_mod_expression . MOD minus_expression
+   55 mul_div_mod_expression: minus_expression .
 
-    MUL  shift, and go to state 66
-    DIV  shift, and go to state 67
-    MOD  shift, and go to state 68
-
-    $default  reduce using rule 51 (add_sub_expression)
+    $default  reduce using rule 55 (mul_div_mod_expression)
 
 
 state 36
 
-   54 mul_div_mod_expression: minus_expression .
+   38 assign_expression: postfix_expression . ASSIGN expression
+   39                  | postfix_expression . ASSIGN array_expression
+   59 minus_expression: postfix_expression .
+   62 postfix_expression: postfix_expression . LB expression RB
+   63                   | postfix_expression . DOT IDENTIFIER
+   64                   | postfix_expression . DOT IDENTIFIER LP argument_list RP
+   65                   | postfix_expression . DOT IDENTIFIER LP RP
+   66                   | postfix_expression . INCR
+   67                   | postfix_expression . DECR
 
-    $default  reduce using rule 54 (mul_div_mod_expression)
+    INCR    shift, and go to state 65
+    DECR    shift, and go to state 66
+    LB      shift, and go to state 67
+    DOT     shift, and go to state 68
+    ASSIGN  shift, and go to state 69
+
+    $default  reduce using rule 59 (minus_expression)
 
 
 state 37
 
-   38 assign_expression: postfix_expression . ASSIGN expression
-   58 minus_expression: postfix_expression .
-   61 postfix_expression: postfix_expression . LB expression RB
-   62                   | postfix_expression . DOT IDENTIFIER LP argument_list RP
-   63                   | postfix_expression . DOT IDENTIFIER LP RP
-   64                   | postfix_expression . INCR
-   65                   | postfix_expression . DECR
+   61 postfix_expression: primary_expression .
 
-    INCR    shift, and go to state 69
-    DECR    shift, and go to state 70
-    LB      shift, and go to state 71
-    DOT     shift, and go to state 72
-    ASSIGN  shift, and go to state 73
-
-    $default  reduce using rule 58 (minus_expression)
+    $default  reduce using rule 61 (postfix_expression)
 
 
 state 38
 
-   60 postfix_expression: primary_expression .
+   68 primary_expression: function_call_expression .
 
-    $default  reduce using rule 60 (postfix_expression)
+    $default  reduce using rule 68 (primary_expression)
 
 
 state 39
 
-   66 primary_expression: function_call_expression .
-
-    $default  reduce using rule 66 (primary_expression)
-
-
-state 40
-
-   75 primary_expression: array_expression .
-
-    $default  reduce using rule 75 (primary_expression)
-
-
-state 41
-
-   76 function_call_expression: IDENTIFIER LP . argument_list RP
-   77                         | IDENTIFIER LP . RP
+   77 function_call_expression: IDENTIFIER LP . argument_list RP
+   78                         | IDENTIFIER LP . RP
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -792,58 +742,56 @@ state 41
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    RP              shift, and go to state 74
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    RP              shift, and go to state 70
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    argument_list             go to state 75
-    expression                go to state 76
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    argument_list             go to state 71
+    expression                go to state 72
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 42
+state 40
 
     5 function_def: FUNCTION IDENTIFIER . LP parameter_list RP block
     6             | FUNCTION IDENTIFIER . LP RP block
 
-    LP  shift, and go to state 77
+    LP  shift, and go to state 73
 
 
-state 43
+state 41
 
    22 if_statement: IF expression . block
    23             | IF expression . block ELSE block
    24             | IF expression . block elseif_list
    25             | IF expression . block elseif_list ELSE block
 
-    LC  shift, and go to state 78
+    LC  shift, and go to state 74
 
-    block  go to state 79
+    block  go to state 75
 
 
-state 44
+state 42
 
    30 while_statement: WHILE expression . block
 
-    LC  shift, and go to state 78
+    LC  shift, and go to state 74
 
-    block  go to state 80
+    block  go to state 76
 
 
-state 45
+state 43
 
    29 for_statement: FOR LP . expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP block
 
@@ -853,114 +801,97 @@ state 45
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
     $default  reduce using rule 34 (expression_opt)
 
-    expression_opt            go to state 81
-    expression                go to state 82
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression_opt            go to state 77
+    expression                go to state 78
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 46
+state 44
 
    31 return_statement: RETURN expression . SEMICOLON
 
-    SEMICOLON  shift, and go to state 83
+    SEMICOLON  shift, and go to state 79
 
 
-state 47
+state 45
 
    32 break_statement: BREAK SEMICOLON .
 
     $default  reduce using rule 32 (break_statement)
 
 
-state 48
+state 46
 
    33 continue_statement: CONTINUE SEMICOLON .
 
     $default  reduce using rule 33 (continue_statement)
 
 
+state 47
+
+   69 primary_expression: LP expression . RP
+
+    RP  shift, and go to state 80
+
+
+state 48
+
+   60 minus_expression: SUB postfix_expression .
+   62 postfix_expression: postfix_expression . LB expression RB
+   63                   | postfix_expression . DOT IDENTIFIER
+   64                   | postfix_expression . DOT IDENTIFIER LP argument_list RP
+   65                   | postfix_expression . DOT IDENTIFIER LP RP
+   66                   | postfix_expression . INCR
+   67                   | postfix_expression . DECR
+
+    INCR  shift, and go to state 65
+    DECR  shift, and go to state 66
+    LB    shift, and go to state 67
+    DOT   shift, and go to state 68
+
+    $default  reduce using rule 60 (minus_expression)
+
+
 state 49
-
-   67 primary_expression: LP expression . RP
-
-    RP  shift, and go to state 84
-
-
-state 50
-
-   79 expression_list: expression .
-
-    $default  reduce using rule 79 (expression_list)
-
-
-state 51
-
-   80 expression_list: expression_list . COMMA expression
-   81 array_expression: LC expression_list . RC
-
-    RC     shift, and go to state 85
-    COMMA  shift, and go to state 86
-
-
-state 52
-
-   59 minus_expression: SUB postfix_expression .
-   61 postfix_expression: postfix_expression . LB expression RB
-   62                   | postfix_expression . DOT IDENTIFIER LP argument_list RP
-   63                   | postfix_expression . DOT IDENTIFIER LP RP
-   64                   | postfix_expression . INCR
-   65                   | postfix_expression . DECR
-
-    INCR  shift, and go to state 69
-    DECR  shift, and go to state 70
-    LB    shift, and go to state 71
-    DOT   shift, and go to state 72
-
-    $default  reduce using rule 59 (minus_expression)
-
-
-state 53
 
     0 $accept: translation_unit $end .
 
     $default  accept
 
 
-state 54
+state 50
 
     2 translation_unit: translation_unit def_or_statement .
 
     $default  reduce using rule 2 (translation_unit)
 
 
-state 55
+state 51
 
    15 statement: expression SEMICOLON .
 
     $default  reduce using rule 15 (statement)
 
 
-state 56
+state 52
 
-   40 logical_or_expression: logical_or_expression LOGICAL_OR . logical_and_expression
+   41 logical_or_expression: logical_or_expression LOGICAL_OR . logical_and_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -968,26 +899,116 @@ state 56
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    logical_and_expression    go to state 87
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    logical_and_expression    go to state 81
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
+
+
+state 53
+
+   43 logical_and_expression: logical_and_expression LOGICAL_AND . equality_expression
+
+    INT_LITERAL     shift, and go to state 1
+    DOUBLE_LITERAL  shift, and go to state 2
+    STRING_LITERAL  shift, and go to state 3
+    IDENTIFIER      shift, and go to state 4
+    NULL_T          shift, and go to state 12
+    LP              shift, and go to state 13
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
+
+    equality_expression       go to state 83
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
+
+
+state 54
+
+   45 equality_expression: equality_expression EQ . relational_expression
+
+    INT_LITERAL     shift, and go to state 1
+    DOUBLE_LITERAL  shift, and go to state 2
+    STRING_LITERAL  shift, and go to state 3
+    IDENTIFIER      shift, and go to state 4
+    NULL_T          shift, and go to state 12
+    LP              shift, and go to state 13
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
+
+    relational_expression     go to state 84
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
+
+
+state 55
+
+   46 equality_expression: equality_expression NE . relational_expression
+
+    INT_LITERAL     shift, and go to state 1
+    DOUBLE_LITERAL  shift, and go to state 2
+    STRING_LITERAL  shift, and go to state 3
+    IDENTIFIER      shift, and go to state 4
+    NULL_T          shift, and go to state 12
+    LP              shift, and go to state 13
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
+
+    relational_expression     go to state 85
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
+
+
+state 56
+
+   48 relational_expression: relational_expression GT . add_sub_expression
+
+    INT_LITERAL     shift, and go to state 1
+    DOUBLE_LITERAL  shift, and go to state 2
+    STRING_LITERAL  shift, and go to state 3
+    IDENTIFIER      shift, and go to state 4
+    NULL_T          shift, and go to state 12
+    LP              shift, and go to state 13
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
+
+    add_sub_expression        go to state 86
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 57
 
-   42 logical_and_expression: logical_and_expression LOGICAL_AND . equality_expression
+   49 relational_expression: relational_expression GE . add_sub_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -995,25 +1016,21 @@ state 57
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    equality_expression       go to state 89
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    add_sub_expression        go to state 87
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 58
 
-   44 equality_expression: equality_expression EQ . relational_expression
+   50 relational_expression: relational_expression LT . add_sub_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1021,24 +1038,21 @@ state 58
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    relational_expression     go to state 90
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    add_sub_expression        go to state 88
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 59
 
-   45 equality_expression: equality_expression NE . relational_expression
+   51 relational_expression: relational_expression LE . add_sub_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1046,24 +1060,21 @@ state 59
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    relational_expression     go to state 91
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    add_sub_expression        go to state 89
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 60
 
-   47 relational_expression: relational_expression GT . add_sub_expression
+   53 add_sub_expression: add_sub_expression ADD . mul_div_mod_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1071,23 +1082,20 @@ state 60
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    add_sub_expression        go to state 92
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    mul_div_mod_expression    go to state 90
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 61
 
-   48 relational_expression: relational_expression GE . add_sub_expression
+   54 add_sub_expression: add_sub_expression SUB . mul_div_mod_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1095,23 +1103,20 @@ state 61
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    add_sub_expression        go to state 93
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    mul_div_mod_expression    go to state 91
+    minus_expression          go to state 35
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 62
 
-   49 relational_expression: relational_expression LT . add_sub_expression
+   56 mul_div_mod_expression: mul_div_mod_expression MUL . minus_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1119,23 +1124,19 @@ state 62
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    add_sub_expression        go to state 94
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    minus_expression          go to state 92
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 63
 
-   50 relational_expression: relational_expression LE . add_sub_expression
+   57 mul_div_mod_expression: mul_div_mod_expression DIV . minus_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1143,23 +1144,19 @@ state 63
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    add_sub_expression        go to state 95
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    minus_expression          go to state 93
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 64
 
-   52 add_sub_expression: add_sub_expression ADD . mul_div_mod_expression
+   58 mul_div_mod_expression: mul_div_mod_expression MOD . minus_expression
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1167,67 +1164,33 @@ state 64
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    mul_div_mod_expression    go to state 96
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    minus_expression          go to state 94
+    postfix_expression        go to state 82
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 65
 
-   53 add_sub_expression: add_sub_expression SUB . mul_div_mod_expression
+   66 postfix_expression: postfix_expression INCR .
 
-    INT_LITERAL     shift, and go to state 1
-    DOUBLE_LITERAL  shift, and go to state 2
-    STRING_LITERAL  shift, and go to state 3
-    IDENTIFIER      shift, and go to state 4
-    NULL_T          shift, and go to state 12
-    LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
-
-    mul_div_mod_expression    go to state 97
-    minus_expression          go to state 36
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    $default  reduce using rule 66 (postfix_expression)
 
 
 state 66
 
-   55 mul_div_mod_expression: mul_div_mod_expression MUL . minus_expression
+   67 postfix_expression: postfix_expression DECR .
 
-    INT_LITERAL     shift, and go to state 1
-    DOUBLE_LITERAL  shift, and go to state 2
-    STRING_LITERAL  shift, and go to state 3
-    IDENTIFIER      shift, and go to state 4
-    NULL_T          shift, and go to state 12
-    LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
-
-    minus_expression          go to state 98
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    $default  reduce using rule 67 (postfix_expression)
 
 
 state 67
 
-   56 mul_div_mod_expression: mul_div_mod_expression DIV . minus_expression
+   62 postfix_expression: postfix_expression LB . expression RB
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1235,157 +1198,99 @@ state 67
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    minus_expression          go to state 99
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression                go to state 95
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 68
 
-   57 mul_div_mod_expression: mul_div_mod_expression MOD . minus_expression
+   63 postfix_expression: postfix_expression DOT . IDENTIFIER
+   64                   | postfix_expression DOT . IDENTIFIER LP argument_list RP
+   65                   | postfix_expression DOT . IDENTIFIER LP RP
 
-    INT_LITERAL     shift, and go to state 1
-    DOUBLE_LITERAL  shift, and go to state 2
-    STRING_LITERAL  shift, and go to state 3
-    IDENTIFIER      shift, and go to state 4
-    NULL_T          shift, and go to state 12
-    LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
-
-    minus_expression          go to state 100
-    postfix_expression        go to state 88
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    IDENTIFIER  shift, and go to state 96
 
 
 state 69
 
-   64 postfix_expression: postfix_expression INCR .
+   38 assign_expression: postfix_expression ASSIGN . expression
+   39                  | postfix_expression ASSIGN . array_expression
 
-    $default  reduce using rule 64 (postfix_expression)
+    INT_LITERAL     shift, and go to state 1
+    DOUBLE_LITERAL  shift, and go to state 2
+    STRING_LITERAL  shift, and go to state 3
+    IDENTIFIER      shift, and go to state 4
+    NULL_T          shift, and go to state 12
+    LP              shift, and go to state 13
+    LB              shift, and go to state 97
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
+
+    expression                go to state 98
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
+    array_expression          go to state 99
 
 
 state 70
 
-   65 postfix_expression: postfix_expression DECR .
+   78 function_call_expression: IDENTIFIER LP RP .
 
-    $default  reduce using rule 65 (postfix_expression)
+    $default  reduce using rule 78 (function_call_expression)
 
 
 state 71
 
-   61 postfix_expression: postfix_expression LB . expression RB
+    8 argument_list: argument_list . COMMA expression
+   77 function_call_expression: IDENTIFIER LP argument_list . RP
 
-    INT_LITERAL     shift, and go to state 1
-    DOUBLE_LITERAL  shift, and go to state 2
-    STRING_LITERAL  shift, and go to state 3
-    IDENTIFIER      shift, and go to state 4
-    NULL_T          shift, and go to state 12
-    LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
-
-    expression                go to state 101
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    RP     shift, and go to state 100
+    COMMA  shift, and go to state 101
 
 
 state 72
-
-   62 postfix_expression: postfix_expression DOT . IDENTIFIER LP argument_list RP
-   63                   | postfix_expression DOT . IDENTIFIER LP RP
-
-    IDENTIFIER  shift, and go to state 102
-
-
-state 73
-
-   38 assign_expression: postfix_expression ASSIGN . expression
-
-    INT_LITERAL     shift, and go to state 1
-    DOUBLE_LITERAL  shift, and go to state 2
-    STRING_LITERAL  shift, and go to state 3
-    IDENTIFIER      shift, and go to state 4
-    NULL_T          shift, and go to state 12
-    LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
-
-    expression                go to state 103
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
-
-
-state 74
-
-   77 function_call_expression: IDENTIFIER LP RP .
-
-    $default  reduce using rule 77 (function_call_expression)
-
-
-state 75
-
-    8 argument_list: argument_list . COMMA expression
-   76 function_call_expression: IDENTIFIER LP argument_list . RP
-
-    RP     shift, and go to state 104
-    COMMA  shift, and go to state 105
-
-
-state 76
 
     7 argument_list: expression .
 
     $default  reduce using rule 7 (argument_list)
 
 
-state 77
+state 73
 
     5 function_def: FUNCTION IDENTIFIER LP . parameter_list RP block
     6             | FUNCTION IDENTIFIER LP . RP block
 
-    IDENTIFIER  shift, and go to state 106
-    RP          shift, and go to state 107
+    IDENTIFIER  shift, and go to state 102
+    RP          shift, and go to state 103
 
-    parameter_list  go to state 108
+    parameter_list  go to state 104
 
 
-state 78
+state 74
 
    11 block: LC . statement_list RC
    12      | LC . RC
@@ -1402,95 +1307,273 @@ state 78
     CONTINUE        shift, and go to state 11
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    RC              shift, and go to state 109
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    RC              shift, and go to state 105
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    statement_list            go to state 110
-    statement                 go to state 111
-    if_statement              go to state 22
-    for_statement             go to state 23
-    while_statement           go to state 24
-    return_statement          go to state 25
-    break_statement           go to state 26
-    continue_statement        go to state 27
-    expression                go to state 28
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    statement_list            go to state 106
+    statement                 go to state 107
+    if_statement              go to state 21
+    for_statement             go to state 22
+    while_statement           go to state 23
+    return_statement          go to state 24
+    break_statement           go to state 25
+    continue_statement        go to state 26
+    expression                go to state 27
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 79
+state 75
 
    22 if_statement: IF expression block .
    23             | IF expression block . ELSE block
    24             | IF expression block . elseif_list
    25             | IF expression block . elseif_list ELSE block
 
-    ELSE  shift, and go to state 112
+    ELSE  shift, and go to state 108
 
     $default  reduce using rule 22 (if_statement)
 
-    elseif_list  go to state 113
-    elseif       go to state 114
+    elseif_list  go to state 109
+    elseif       go to state 110
 
 
-state 80
+state 76
 
    30 while_statement: WHILE expression block .
 
     $default  reduce using rule 30 (while_statement)
 
 
-state 81
+state 77
 
    29 for_statement: FOR LP expression_opt . SEMICOLON expression_opt SEMICOLON expression_opt RP block
 
-    SEMICOLON  shift, and go to state 115
+    SEMICOLON  shift, and go to state 111
 
 
-state 82
+state 78
 
    35 expression_opt: expression .
 
     $default  reduce using rule 35 (expression_opt)
 
 
-state 83
+state 79
 
    31 return_statement: RETURN expression SEMICOLON .
 
     $default  reduce using rule 31 (return_statement)
 
 
+state 80
+
+   69 primary_expression: LP expression RP .
+
+    $default  reduce using rule 69 (primary_expression)
+
+
+state 81
+
+   41 logical_or_expression: logical_or_expression LOGICAL_OR logical_and_expression .
+   43 logical_and_expression: logical_and_expression . LOGICAL_AND equality_expression
+
+    LOGICAL_AND  shift, and go to state 53
+
+    $default  reduce using rule 41 (logical_or_expression)
+
+
+state 82
+
+   59 minus_expression: postfix_expression .
+   62 postfix_expression: postfix_expression . LB expression RB
+   63                   | postfix_expression . DOT IDENTIFIER
+   64                   | postfix_expression . DOT IDENTIFIER LP argument_list RP
+   65                   | postfix_expression . DOT IDENTIFIER LP RP
+   66                   | postfix_expression . INCR
+   67                   | postfix_expression . DECR
+
+    INCR  shift, and go to state 65
+    DECR  shift, and go to state 66
+    LB    shift, and go to state 67
+    DOT   shift, and go to state 68
+
+    $default  reduce using rule 59 (minus_expression)
+
+
+state 83
+
+   43 logical_and_expression: logical_and_expression LOGICAL_AND equality_expression .
+   45 equality_expression: equality_expression . EQ relational_expression
+   46                    | equality_expression . NE relational_expression
+
+    EQ  shift, and go to state 54
+    NE  shift, and go to state 55
+
+    $default  reduce using rule 43 (logical_and_expression)
+
+
 state 84
 
-   67 primary_expression: LP expression RP .
+   45 equality_expression: equality_expression EQ relational_expression .
+   48 relational_expression: relational_expression . GT add_sub_expression
+   49                      | relational_expression . GE add_sub_expression
+   50                      | relational_expression . LT add_sub_expression
+   51                      | relational_expression . LE add_sub_expression
 
-    $default  reduce using rule 67 (primary_expression)
+    GT  shift, and go to state 56
+    GE  shift, and go to state 57
+    LT  shift, and go to state 58
+    LE  shift, and go to state 59
+
+    $default  reduce using rule 45 (equality_expression)
 
 
 state 85
 
-   81 array_expression: LC expression_list RC .
+   46 equality_expression: equality_expression NE relational_expression .
+   48 relational_expression: relational_expression . GT add_sub_expression
+   49                      | relational_expression . GE add_sub_expression
+   50                      | relational_expression . LT add_sub_expression
+   51                      | relational_expression . LE add_sub_expression
 
-    $default  reduce using rule 81 (array_expression)
+    GT  shift, and go to state 56
+    GE  shift, and go to state 57
+    LT  shift, and go to state 58
+    LE  shift, and go to state 59
+
+    $default  reduce using rule 46 (equality_expression)
 
 
 state 86
 
-   80 expression_list: expression_list COMMA . expression
+   48 relational_expression: relational_expression GT add_sub_expression .
+   53 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
+   54                   | add_sub_expression . SUB mul_div_mod_expression
+
+    ADD  shift, and go to state 60
+    SUB  shift, and go to state 61
+
+    $default  reduce using rule 48 (relational_expression)
+
+
+state 87
+
+   49 relational_expression: relational_expression GE add_sub_expression .
+   53 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
+   54                   | add_sub_expression . SUB mul_div_mod_expression
+
+    ADD  shift, and go to state 60
+    SUB  shift, and go to state 61
+
+    $default  reduce using rule 49 (relational_expression)
+
+
+state 88
+
+   50 relational_expression: relational_expression LT add_sub_expression .
+   53 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
+   54                   | add_sub_expression . SUB mul_div_mod_expression
+
+    ADD  shift, and go to state 60
+    SUB  shift, and go to state 61
+
+    $default  reduce using rule 50 (relational_expression)
+
+
+state 89
+
+   51 relational_expression: relational_expression LE add_sub_expression .
+   53 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
+   54                   | add_sub_expression . SUB mul_div_mod_expression
+
+    ADD  shift, and go to state 60
+    SUB  shift, and go to state 61
+
+    $default  reduce using rule 51 (relational_expression)
+
+
+state 90
+
+   53 add_sub_expression: add_sub_expression ADD mul_div_mod_expression .
+   56 mul_div_mod_expression: mul_div_mod_expression . MUL minus_expression
+   57                       | mul_div_mod_expression . DIV minus_expression
+   58                       | mul_div_mod_expression . MOD minus_expression
+
+    MUL  shift, and go to state 62
+    DIV  shift, and go to state 63
+    MOD  shift, and go to state 64
+
+    $default  reduce using rule 53 (add_sub_expression)
+
+
+state 91
+
+   54 add_sub_expression: add_sub_expression SUB mul_div_mod_expression .
+   56 mul_div_mod_expression: mul_div_mod_expression . MUL minus_expression
+   57                       | mul_div_mod_expression . DIV minus_expression
+   58                       | mul_div_mod_expression . MOD minus_expression
+
+    MUL  shift, and go to state 62
+    DIV  shift, and go to state 63
+    MOD  shift, and go to state 64
+
+    $default  reduce using rule 54 (add_sub_expression)
+
+
+state 92
+
+   56 mul_div_mod_expression: mul_div_mod_expression MUL minus_expression .
+
+    $default  reduce using rule 56 (mul_div_mod_expression)
+
+
+state 93
+
+   57 mul_div_mod_expression: mul_div_mod_expression DIV minus_expression .
+
+    $default  reduce using rule 57 (mul_div_mod_expression)
+
+
+state 94
+
+   58 mul_div_mod_expression: mul_div_mod_expression MOD minus_expression .
+
+    $default  reduce using rule 58 (mul_div_mod_expression)
+
+
+state 95
+
+   62 postfix_expression: postfix_expression LB expression . RB
+
+    RB  shift, and go to state 112
+
+
+state 96
+
+   63 postfix_expression: postfix_expression DOT IDENTIFIER .
+   64                   | postfix_expression DOT IDENTIFIER . LP argument_list RP
+   65                   | postfix_expression DOT IDENTIFIER . LP RP
+
+    LP  shift, and go to state 113
+
+    $default  reduce using rule 63 (postfix_expression)
+
+
+state 97
+
+   82 array_expression: LB . expression_list RB
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1498,224 +1581,49 @@ state 86
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    expression                go to state 116
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    $default  reduce using rule 79 (expression_list)
 
-
-state 87
-
-   40 logical_or_expression: logical_or_expression LOGICAL_OR logical_and_expression .
-   42 logical_and_expression: logical_and_expression . LOGICAL_AND equality_expression
-
-    LOGICAL_AND  shift, and go to state 57
-
-    $default  reduce using rule 40 (logical_or_expression)
-
-
-state 88
-
-   58 minus_expression: postfix_expression .
-   61 postfix_expression: postfix_expression . LB expression RB
-   62                   | postfix_expression . DOT IDENTIFIER LP argument_list RP
-   63                   | postfix_expression . DOT IDENTIFIER LP RP
-   64                   | postfix_expression . INCR
-   65                   | postfix_expression . DECR
-
-    INCR  shift, and go to state 69
-    DECR  shift, and go to state 70
-    LB    shift, and go to state 71
-    DOT   shift, and go to state 72
-
-    $default  reduce using rule 58 (minus_expression)
-
-
-state 89
-
-   42 logical_and_expression: logical_and_expression LOGICAL_AND equality_expression .
-   44 equality_expression: equality_expression . EQ relational_expression
-   45                    | equality_expression . NE relational_expression
-
-    EQ  shift, and go to state 58
-    NE  shift, and go to state 59
-
-    $default  reduce using rule 42 (logical_and_expression)
-
-
-state 90
-
-   44 equality_expression: equality_expression EQ relational_expression .
-   47 relational_expression: relational_expression . GT add_sub_expression
-   48                      | relational_expression . GE add_sub_expression
-   49                      | relational_expression . LT add_sub_expression
-   50                      | relational_expression . LE add_sub_expression
-
-    GT  shift, and go to state 60
-    GE  shift, and go to state 61
-    LT  shift, and go to state 62
-    LE  shift, and go to state 63
-
-    $default  reduce using rule 44 (equality_expression)
-
-
-state 91
-
-   45 equality_expression: equality_expression NE relational_expression .
-   47 relational_expression: relational_expression . GT add_sub_expression
-   48                      | relational_expression . GE add_sub_expression
-   49                      | relational_expression . LT add_sub_expression
-   50                      | relational_expression . LE add_sub_expression
-
-    GT  shift, and go to state 60
-    GE  shift, and go to state 61
-    LT  shift, and go to state 62
-    LE  shift, and go to state 63
-
-    $default  reduce using rule 45 (equality_expression)
-
-
-state 92
-
-   47 relational_expression: relational_expression GT add_sub_expression .
-   52 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
-   53                   | add_sub_expression . SUB mul_div_mod_expression
-
-    ADD  shift, and go to state 64
-    SUB  shift, and go to state 65
-
-    $default  reduce using rule 47 (relational_expression)
-
-
-state 93
-
-   48 relational_expression: relational_expression GE add_sub_expression .
-   52 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
-   53                   | add_sub_expression . SUB mul_div_mod_expression
-
-    ADD  shift, and go to state 64
-    SUB  shift, and go to state 65
-
-    $default  reduce using rule 48 (relational_expression)
-
-
-state 94
-
-   49 relational_expression: relational_expression LT add_sub_expression .
-   52 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
-   53                   | add_sub_expression . SUB mul_div_mod_expression
-
-    ADD  shift, and go to state 64
-    SUB  shift, and go to state 65
-
-    $default  reduce using rule 49 (relational_expression)
-
-
-state 95
-
-   50 relational_expression: relational_expression LE add_sub_expression .
-   52 add_sub_expression: add_sub_expression . ADD mul_div_mod_expression
-   53                   | add_sub_expression . SUB mul_div_mod_expression
-
-    ADD  shift, and go to state 64
-    SUB  shift, and go to state 65
-
-    $default  reduce using rule 50 (relational_expression)
-
-
-state 96
-
-   52 add_sub_expression: add_sub_expression ADD mul_div_mod_expression .
-   55 mul_div_mod_expression: mul_div_mod_expression . MUL minus_expression
-   56                       | mul_div_mod_expression . DIV minus_expression
-   57                       | mul_div_mod_expression . MOD minus_expression
-
-    MUL  shift, and go to state 66
-    DIV  shift, and go to state 67
-    MOD  shift, and go to state 68
-
-    $default  reduce using rule 52 (add_sub_expression)
-
-
-state 97
-
-   53 add_sub_expression: add_sub_expression SUB mul_div_mod_expression .
-   55 mul_div_mod_expression: mul_div_mod_expression . MUL minus_expression
-   56                       | mul_div_mod_expression . DIV minus_expression
-   57                       | mul_div_mod_expression . MOD minus_expression
-
-    MUL  shift, and go to state 66
-    DIV  shift, and go to state 67
-    MOD  shift, and go to state 68
-
-    $default  reduce using rule 53 (add_sub_expression)
+    expression                go to state 114
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
+    expression_list           go to state 115
 
 
 state 98
-
-   55 mul_div_mod_expression: mul_div_mod_expression MUL minus_expression .
-
-    $default  reduce using rule 55 (mul_div_mod_expression)
-
-
-state 99
-
-   56 mul_div_mod_expression: mul_div_mod_expression DIV minus_expression .
-
-    $default  reduce using rule 56 (mul_div_mod_expression)
-
-
-state 100
-
-   57 mul_div_mod_expression: mul_div_mod_expression MOD minus_expression .
-
-    $default  reduce using rule 57 (mul_div_mod_expression)
-
-
-state 101
-
-   61 postfix_expression: postfix_expression LB expression . RB
-
-    RB  shift, and go to state 117
-
-
-state 102
-
-   62 postfix_expression: postfix_expression DOT IDENTIFIER . LP argument_list RP
-   63                   | postfix_expression DOT IDENTIFIER . LP RP
-
-    LP  shift, and go to state 118
-
-
-state 103
 
    38 assign_expression: postfix_expression ASSIGN expression .
 
     $default  reduce using rule 38 (assign_expression)
 
 
-state 104
+state 99
 
-   76 function_call_expression: IDENTIFIER LP argument_list RP .
+   39 assign_expression: postfix_expression ASSIGN array_expression .
 
-    $default  reduce using rule 76 (function_call_expression)
+    $default  reduce using rule 39 (assign_expression)
 
 
-state 105
+state 100
+
+   77 function_call_expression: IDENTIFIER LP argument_list RP .
+
+    $default  reduce using rule 77 (function_call_expression)
+
+
+state 101
 
     8 argument_list: argument_list COMMA . expression
 
@@ -1725,59 +1633,57 @@ state 105
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    expression                go to state 119
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression                go to state 116
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 106
+state 102
 
     9 parameter_list: IDENTIFIER .
 
     $default  reduce using rule 9 (parameter_list)
 
 
-state 107
+state 103
 
     6 function_def: FUNCTION IDENTIFIER LP RP . block
 
-    LC  shift, and go to state 78
+    LC  shift, and go to state 74
 
-    block  go to state 120
+    block  go to state 117
 
 
-state 108
+state 104
 
     5 function_def: FUNCTION IDENTIFIER LP parameter_list . RP block
    10 parameter_list: parameter_list . COMMA IDENTIFIER
 
-    RP     shift, and go to state 121
-    COMMA  shift, and go to state 122
+    RP     shift, and go to state 118
+    COMMA  shift, and go to state 119
 
 
-state 109
+state 105
 
    12 block: LC RC .
 
     $default  reduce using rule 12 (block)
 
 
-state 110
+state 106
 
    11 block: LC statement_list . RC
    14 statement_list: statement_list . statement
@@ -1794,73 +1700,71 @@ state 110
     CONTINUE        shift, and go to state 11
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    RC              shift, and go to state 123
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    RC              shift, and go to state 120
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    statement                 go to state 124
-    if_statement              go to state 22
-    for_statement             go to state 23
-    while_statement           go to state 24
-    return_statement          go to state 25
-    break_statement           go to state 26
-    continue_statement        go to state 27
-    expression                go to state 28
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    statement                 go to state 121
+    if_statement              go to state 21
+    for_statement             go to state 22
+    while_statement           go to state 23
+    return_statement          go to state 24
+    break_statement           go to state 25
+    continue_statement        go to state 26
+    expression                go to state 27
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 111
+state 107
 
    13 statement_list: statement .
 
     $default  reduce using rule 13 (statement_list)
 
 
-state 112
+state 108
 
    23 if_statement: IF expression block ELSE . block
    28 elseif: ELSE . IF expression block
 
-    IF  shift, and go to state 125
-    LC  shift, and go to state 78
+    IF  shift, and go to state 122
+    LC  shift, and go to state 74
 
-    block  go to state 126
+    block  go to state 123
 
 
-state 113
+state 109
 
    24 if_statement: IF expression block elseif_list .
    25             | IF expression block elseif_list . ELSE block
    27 elseif_list: elseif_list . elseif
 
-    ELSE  shift, and go to state 127
+    ELSE  shift, and go to state 124
 
     $default  reduce using rule 24 (if_statement)
 
-    elseif  go to state 128
+    elseif  go to state 125
 
 
-state 114
+state 110
 
    26 elseif_list: elseif .
 
     $default  reduce using rule 26 (elseif_list)
 
 
-state 115
+state 111
 
    29 for_statement: FOR LP expression_opt SEMICOLON . expression_opt SEMICOLON expression_opt RP block
 
@@ -1870,47 +1774,38 @@ state 115
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
     $default  reduce using rule 34 (expression_opt)
 
-    expression_opt            go to state 129
-    expression                go to state 82
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression_opt            go to state 126
+    expression                go to state 78
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 116
+state 112
 
-   80 expression_list: expression_list COMMA expression .
+   62 postfix_expression: postfix_expression LB expression RB .
 
-    $default  reduce using rule 80 (expression_list)
-
-
-state 117
-
-   61 postfix_expression: postfix_expression LB expression RB .
-
-    $default  reduce using rule 61 (postfix_expression)
+    $default  reduce using rule 62 (postfix_expression)
 
 
-state 118
+state 113
 
-   62 postfix_expression: postfix_expression DOT IDENTIFIER LP . argument_list RP
-   63                   | postfix_expression DOT IDENTIFIER LP . RP
+   64 postfix_expression: postfix_expression DOT IDENTIFIER LP . argument_list RP
+   65                   | postfix_expression DOT IDENTIFIER LP . RP
 
     INT_LITERAL     shift, and go to state 1
     DOUBLE_LITERAL  shift, and go to state 2
@@ -1918,73 +1813,87 @@ state 118
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    RP              shift, and go to state 130
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    RP              shift, and go to state 127
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    argument_list             go to state 131
-    expression                go to state 76
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    argument_list             go to state 128
+    expression                go to state 72
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 119
+state 114
+
+   80 expression_list: expression .
+
+    $default  reduce using rule 80 (expression_list)
+
+
+state 115
+
+   81 expression_list: expression_list . COMMA expression
+   82 array_expression: LB expression_list . RB
+
+    RB     shift, and go to state 129
+    COMMA  shift, and go to state 130
+
+
+state 116
 
     8 argument_list: argument_list COMMA expression .
 
     $default  reduce using rule 8 (argument_list)
 
 
-state 120
+state 117
 
     6 function_def: FUNCTION IDENTIFIER LP RP block .
 
     $default  reduce using rule 6 (function_def)
 
 
-state 121
+state 118
 
     5 function_def: FUNCTION IDENTIFIER LP parameter_list RP . block
 
-    LC  shift, and go to state 78
+    LC  shift, and go to state 74
 
-    block  go to state 132
+    block  go to state 131
 
 
-state 122
+state 119
 
    10 parameter_list: parameter_list COMMA . IDENTIFIER
 
-    IDENTIFIER  shift, and go to state 133
+    IDENTIFIER  shift, and go to state 132
 
 
-state 123
+state 120
 
    11 block: LC statement_list RC .
 
     $default  reduce using rule 11 (block)
 
 
-state 124
+state 121
 
    14 statement_list: statement_list statement .
 
     $default  reduce using rule 14 (statement_list)
 
 
-state 125
+state 122
 
    28 elseif: ELSE IF . expression block
 
@@ -1994,105 +1903,138 @@ state 125
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
-    expression                go to state 134
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression                go to state 133
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
-state 126
+state 123
 
    23 if_statement: IF expression block ELSE block .
 
     $default  reduce using rule 23 (if_statement)
 
 
-state 127
+state 124
 
    25 if_statement: IF expression block elseif_list ELSE . block
    28 elseif: ELSE . IF expression block
 
-    IF  shift, and go to state 125
-    LC  shift, and go to state 78
+    IF  shift, and go to state 122
+    LC  shift, and go to state 74
 
-    block  go to state 135
+    block  go to state 134
 
 
-state 128
+state 125
 
    27 elseif_list: elseif_list elseif .
 
     $default  reduce using rule 27 (elseif_list)
 
 
-state 129
+state 126
 
    29 for_statement: FOR LP expression_opt SEMICOLON expression_opt . SEMICOLON expression_opt RP block
 
-    SEMICOLON  shift, and go to state 136
+    SEMICOLON  shift, and go to state 135
+
+
+state 127
+
+   65 postfix_expression: postfix_expression DOT IDENTIFIER LP RP .
+
+    $default  reduce using rule 65 (postfix_expression)
+
+
+state 128
+
+    8 argument_list: argument_list . COMMA expression
+   64 postfix_expression: postfix_expression DOT IDENTIFIER LP argument_list . RP
+
+    RP     shift, and go to state 136
+    COMMA  shift, and go to state 101
+
+
+state 129
+
+   82 array_expression: LB expression_list RB .
+
+    $default  reduce using rule 82 (array_expression)
 
 
 state 130
 
-   63 postfix_expression: postfix_expression DOT IDENTIFIER LP RP .
+   81 expression_list: expression_list COMMA . expression
 
-    $default  reduce using rule 63 (postfix_expression)
+    INT_LITERAL     shift, and go to state 1
+    DOUBLE_LITERAL  shift, and go to state 2
+    STRING_LITERAL  shift, and go to state 3
+    IDENTIFIER      shift, and go to state 4
+    NULL_T          shift, and go to state 12
+    LP              shift, and go to state 13
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
+
+    expression                go to state 137
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
 
 
 state 131
-
-    8 argument_list: argument_list . COMMA expression
-   62 postfix_expression: postfix_expression DOT IDENTIFIER LP argument_list . RP
-
-    RP     shift, and go to state 137
-    COMMA  shift, and go to state 105
-
-
-state 132
 
     5 function_def: FUNCTION IDENTIFIER LP parameter_list RP block .
 
     $default  reduce using rule 5 (function_def)
 
 
-state 133
+state 132
 
    10 parameter_list: parameter_list COMMA IDENTIFIER .
 
     $default  reduce using rule 10 (parameter_list)
 
 
-state 134
+state 133
 
    28 elseif: ELSE IF expression . block
 
-    LC  shift, and go to state 78
+    LC  shift, and go to state 74
 
     block  go to state 138
 
 
-state 135
+state 134
 
    25 if_statement: IF expression block elseif_list ELSE block .
 
     $default  reduce using rule 25 (if_statement)
 
 
-state 136
+state 135
 
    29 for_statement: FOR LP expression_opt SEMICOLON expression_opt SEMICOLON . expression_opt RP block
 
@@ -2102,34 +2044,39 @@ state 136
     IDENTIFIER      shift, and go to state 4
     NULL_T          shift, and go to state 12
     LP              shift, and go to state 13
-    LC              shift, and go to state 14
-    SUB             shift, and go to state 15
-    TRUE_T          shift, and go to state 16
-    FALSE_T         shift, and go to state 17
+    SUB             shift, and go to state 14
+    TRUE_T          shift, and go to state 15
+    FALSE_T         shift, and go to state 16
 
     $default  reduce using rule 34 (expression_opt)
 
     expression_opt            go to state 139
-    expression                go to state 82
-    assign_expression         go to state 29
-    logical_or_expression     go to state 30
-    logical_and_expression    go to state 31
-    equality_expression       go to state 32
-    relational_expression     go to state 33
-    add_sub_expression        go to state 34
-    mul_div_mod_expression    go to state 35
-    minus_expression          go to state 36
-    postfix_expression        go to state 37
-    primary_expression        go to state 38
-    function_call_expression  go to state 39
-    array_expression          go to state 40
+    expression                go to state 78
+    assign_expression         go to state 28
+    logical_or_expression     go to state 29
+    logical_and_expression    go to state 30
+    equality_expression       go to state 31
+    relational_expression     go to state 32
+    add_sub_expression        go to state 33
+    mul_div_mod_expression    go to state 34
+    minus_expression          go to state 35
+    postfix_expression        go to state 36
+    primary_expression        go to state 37
+    function_call_expression  go to state 38
+
+
+state 136
+
+   64 postfix_expression: postfix_expression DOT IDENTIFIER LP argument_list RP .
+
+    $default  reduce using rule 64 (postfix_expression)
 
 
 state 137
 
-   62 postfix_expression: postfix_expression DOT IDENTIFIER LP argument_list RP .
+   81 expression_list: expression_list COMMA expression .
 
-    $default  reduce using rule 62 (postfix_expression)
+    $default  reduce using rule 81 (expression_list)
 
 
 state 138
@@ -2150,7 +2097,7 @@ state 140
 
    29 for_statement: FOR LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP . block
 
-    LC  shift, and go to state 78
+    LC  shift, and go to state 74
 
     block  go to state 141
 

@@ -42,6 +42,18 @@ void *MEM_malloc_func(MEM_Controller *controller,
     return ptr;
 }
 
+void *MEM_calloc_func(MEM_Controller *controller, 
+            char *filename, int line, size_t count, size_t size) {
+    void    *ptr;
+    
+    ptr = calloc(count, size);
+    if (ptr == NULL) {
+        error_handler(controller, filename, line, "calloc");
+    }
+
+    return ptr;
+}
+
 void *MEM_realloc_func(MEM_Controller *controller, 
             char *filename, int line, void *ptr, size_t size) {
     void    *new_ptr;

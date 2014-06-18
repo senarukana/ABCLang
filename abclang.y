@@ -180,6 +180,9 @@ assign_expression:
     |   postfix_expression ASSIGN expression {
             $$ = abc_create_assign_expression($1, $3);
         }
+    |   postfix_expression ASSIGN array_expression {
+            $$ = abc_create_assign_expression($1, $3);
+        }
     ;
 
 logical_or_expression:
@@ -257,6 +260,9 @@ postfix_expression:
     |   postfix_expression LB expression RB {
             $$ = abc_create_index_expression($1, $3);
         }
+    |   postfix_expression DOT IDENTIFIER {
+            $$ = abc_create_member_expression($1, $3);
+        }
     |   postfix_expression DOT IDENTIFIER LP argument_list RP {
             $$ = abc_create_method_call_expression($1, $3, $5);
         }
@@ -298,7 +304,6 @@ primary_expression:
     |   NULL_T {
             $$ = abc_create_null_expression();
         }
-    |   array_expression
     ;
 
 function_call_expression:
@@ -323,7 +328,7 @@ expression_list:
     ;
 
 array_expression: 
-        LC expression_list RC {
+        LB expression_list RB {
             $$ = abc_create_array_expression($2);
         }
     ;

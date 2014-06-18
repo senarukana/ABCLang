@@ -1,7 +1,7 @@
 
 TARGET = abclang
 OBJS = y.tab.c lex.yy.c \
-	main.o abc.o create.o error.o eval.o execute.o heap.o stack.o\
+	map.o abc.o create.o error.o eval.o execute.o heap.o stack.o\
 	memory.o native.o string.o util.o wchar.o\
 	./memory/memory.o
 CFLAGS = -c -g -Wall -ansi -DDEBUG
@@ -37,3 +37,4 @@ native.o: native.c abclang.h
 string.o: string.c abclang.h 
 util.o: util.c abclang.h 
 wchar.o: wchar.c abclang.h 
+map.o: map.c abclang.h

@@ -476,6 +476,35 @@ static void eval_incre_decre_expression(LocalEnvironment *env,
     abc_stack_push_value(&result);
 }
 
+static void eval_member_expression(LocalEnvironment *env, MemberExpression *expr, int line_num) {
+    ABC_Value expr_val;
+    ABC_Value *mem;
+
+    eval_expression(env, expr->expr);
+    expr_val = abc_stack_pop_value();
+    if (expr_val.type != ASSOC_OBJECT) {
+        abc_runtime_error(line_num, NO_MEMBER_TYPE_ERR);
+    }
+    mem = abc_search_assoc_member(expr_val.u.object, expr->member_name);
+    if (mem == NULL) {
+        abc_runtime_error(line_num, NO_SUCH_MEMBER_ERR);
+    }
+    abc_stack_push_value(mem);
+}
+
+static void assign_to_member(LocalEnvironment *env, Expression *expr, ABC_Value *src) {
+    ABC_Value *dest;
+    Expression *left;
+    ABC_Value assoc;
+
+    left = expr->u.assign_expr.left;
+    assoc = abc_stack_pop_value();
+
+    if (assoc.type != ABC_ASSOC_VALUE) {
+        abc_runtime_error(expr->line_num, NOT_OBJECT_MEMBER_ASSIGN_ERR);
+    }
+    
+}
 
 static void eval_assign_expression(LocalEnvironment *env, Expression *left, Expression *right) {
     ABC_Value       *lval, rval;

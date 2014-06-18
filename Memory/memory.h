@@ -63,6 +63,9 @@ void MEM_dispose_storage_func(MEM_Controller *controller,
 #define MEM_malloc(size)\
     (MEM_malloc_func(MEM_CURRENT_CONTROLLER, \
                     __FILE__, __LINE__, size))
+#define MEM_calloc(count, size)\
+    (MEM_malloc_func(MEM_CURRENT_CONTROLLER, \
+                    __FILE__, __LINE__, size))
 #define MEM_realloc(ptr, size)\
     (MEM_realloc_func(MEM_CURRENT_CONTROLLER, \
                     __FILE__, __LINE__, ptr, size))

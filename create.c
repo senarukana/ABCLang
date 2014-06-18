@@ -182,6 +182,16 @@ Expression *abc_create_binary_expression(ExpressionType type, Expression *left, 
     return expr;
 }
 
+Expression *abc_create_member_expression(Expression *expr, char *member_name) {
+    Expression *mem_expr;
+
+    mem_expr = create_expression(MEMBER_EXPRESSION);
+    mem_expr->u.member_expr.expr = expr;
+    mem_expr->u.member_expr.member_name = member_name;
+
+    return mem_expr;
+}
+
 Expression *abc_create_function_call_expression(char *identifier,
             ArgumentList *args) {
     Expression *expr;

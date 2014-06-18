@@ -1,7 +1,7 @@
 #include "abclang.h"
 #include <stdio.h>
 
-int main(int args, char **argv) {
+/*int main(int args, char **argv) {
     FILE *fp;
     ABC_Interpreter *inter;
 
@@ -22,4 +22,4 @@ int main(int args, char **argv) {
     ABC_execute(inter);
     fprintf(stderr, "execute complete\n");
     return 0;
-}
+}*/

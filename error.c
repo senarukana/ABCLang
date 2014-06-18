@@ -33,6 +33,9 @@ MessageFormat runtime_error_msg[] = {
     {"INFINITE_WHILE_LOOP_ERR"},
     {"INVALID_ARRAY_EXPRESSION_ERR"},
     {"ARRAY_INDEX_OUT_OF_RANGE"},
+    {"NO_MEMBER_TYPE_ERR"},
+    {"NOT_OBJECT_MEMBER_ASSIGN_ERR"},
+    {"NO_SUCH_MEMBER_ERR"},
     {"dummy"},
 };
 
@@ -41,6 +44,7 @@ MessageFormat internal_err_msg[] = {
     {"UNKNOWN_EXPRESSION_TYPE_ERR"},
     {"UNKNOWN_STATEMENT_TYPE_ERR"},
     {"UNKNOWN_VALUE_TYPE_ERR"},
+    {"INVALID_TYPE_ERR"},
     {"dummy"},
 };
 

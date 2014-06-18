@@ -7,9 +7,13 @@
 #define STACK_ALLOC_SIZE    (1024 * 32)
 #define LINE_BUF_SIZE       (256)
 #define HEAP_THRESHOLDSIZE  (1024 * 256)
+#define MAP_EXPAND_RATIO (1.7)
+#define MAP_INITIAL_SIZE (8)
 
 typedef struct ABC_Value_tag ABC_Value;
 typedef struct ABC_Object_tag ABC_Object;
+typedef struct ABC_Map_tag  ABC_Map;      
+typedef struct ABC_Assoc_tag ABC_Assoc;
 typedef struct Expression_tag Expression;
 typedef struct Statement_tag  Statement;
 typedef struct ParameterList_tag ParameterList;
@@ -19,6 +23,7 @@ typedef struct IdentifierList_tag IdentifierList;
 typedef struct LocalEnvironment_tag LocalEnvironment;
 typedef struct ExpressionList_tag ExpressionList;
 typedef struct Block_tag Block;
+typedef struct FunctionDefinition_tag FunctionDefinition;
 typedef struct ABC_Interpreter_tag ABC_Interpreter;
 
 /* Variable Type */
@@ -41,14 +46,68 @@ typedef enum {
     ABC_POINTER_VALUE,
     ABC_STRING_VALUE,
     ABC_ARRAY_VALUE,
-    ABC_MAP_VALUE
+    ABC_MAP_VALUE,
+    ABC_ASSOC_VALUE,
 } ABC_ValueType;
 
 typedef enum {
     ARRAY_OBJECT = 1,
     STRING_OBJECT,
+    ASSOC_OBJECT,
+    SCOPE_CHAIN_OBJECT,
     MAP_OBJECT
 } ObjectType;
+
+struct ABC_Value_tag {
+    ABC_ValueType type;
+    union {
+        int         int_val;
+        double      double_val;
+        ABC_Bool    bool_val;
+        ABC_Pointer pointer;
+        ABC_Object  *object;
+    }u;
+};
+
+typedef struct {
+    char        *name;
+    ABC_Value   value;
+    ABC_Bool    is_final;
+} AssocMember;
+
+struct ABC_Assoc_tag {
+    int             member_count;
+    AssocMember     *member; 
+};
+
+typedef struct {
+    ABC_Object  *frame; /* ABC_Assoc */
+    ABC_Object  *next;  /* ScopeChain */
+} ScopeChain;
+
+typedef struct {
+    FunctionDefinition  *func;
+    ABC_Object          *environment; /* Scope Chain */
+} ABC_Lambda;
+
+typedef struct hashnode_tag {
+    ABC_Value   key;
+    ABC_Value   val;
+    struct hashnode_tag *next;
+} hashnode;
+
+typedef struct hashmap_tag {
+    hashnode    **table;
+    unsigned long buck_num;
+    unsigned long mask;
+    unsigned long size;
+} hashmap;
+
+struct ABC_Map_tag {
+    hashmap ht[2];
+    int rehash_idx;
+    unsigned long size;
+};
 
 typedef struct ABC_String_tag {
     int         is_literal;
@@ -67,20 +126,12 @@ struct ABC_Object_tag {
     union {
         ABC_String  str;
         ABC_Array   array;
+        ABC_Assoc   assoc;
+        ScopeChain  scope_chain;
+        ABC_Map     map;
     } u;
     struct ABC_Object_tag *prev;
     struct ABC_Object_tag *next;
-};
-
-struct ABC_Value_tag {
-    ABC_ValueType type;
-    union {
-        int         int_val;
-        double      double_val;
-        ABC_Bool    bool_val;
-        ABC_Pointer pointer;
-        ABC_Object  *object;
-    }u;
 };
 
 /* Error */
@@ -116,13 +167,18 @@ typedef enum {
     BAD_CHARACTER_ERR,
     INFINITE_WHILE_LOOP_ERR,
     INVALID_ARRAY_EXPRESSION_ERR,
-    ARRAY_INDEX_OUT_OF_RANGE
+    ARRAY_INDEX_OUT_OF_RANGE,
+    NO_MEMBER_TYPE_ERR,
+    NOT_OBJECT_MEMBER_ASSIGN_ERR,
+    NO_SUCH_MEMBER_ERR
 } RuntimeErrorType;
 
 typedef enum {
     UNKNOWN_EXPRESSION_TYPE_ERR = 1,
     UNKNOWN_STATEMENT_TYPE_ERR,
-    UNKNOWN_VALUE_TYPE_ERR
+    UNKNOWN_VALUE_TYPE_ERR,
+    UNCOMPARABLE_TYPE,
+    INVALID_TYPE_ERR,
 } InternalErrorType;
 
 /* Expression Definition */
@@ -155,6 +211,7 @@ typedef enum {
     INCREMENT_EXPRESSION,
     DECREMENT_EXPRESSION,
     INDEX_EXPRESSION,
+    MEMBER_EXPRESSION,
     METHOD_CALL_EXPRESSION,
     FUNCTION_CALL_EXPRESSION
 } ExpressionType;
@@ -185,6 +242,11 @@ typedef struct {
     ArgumentList    *args;
 } MethodCallExpression;
 
+typedef struct {
+    Expression      *expr;
+    char            *member_name;
+} MemberExpression;
+
 struct Expression_tag {
     ExpressionType type;
     int line_num;
@@ -200,6 +262,7 @@ struct Expression_tag {
         Expression              *singular_expr;
         BinaryExpression        binary_expr;
         FunctionCallExpression  func_expr;
+        MemberExpression        member_expr;
         MethodCallExpression    method_call_expr;
         IndexExpression         index_expr;
     } u;
@@ -323,7 +386,7 @@ typedef enum {
 } FunctionType;
 
 
-typedef struct FunctionDefinition_tag{
+struct FunctionDefinition_tag{
     FunctionType type;
     char    *identifier;
     union {
@@ -336,7 +399,7 @@ typedef struct FunctionDefinition_tag{
         } system_function;
     } u;
     struct FunctionDefinition_tag *next;
-} FunctionDefinition;
+} ;
 
 typedef struct RefInNativeFunc_tag {
     ABC_Object  *object;
@@ -344,6 +407,8 @@ typedef struct RefInNativeFunc_tag {
 } RefInNativeFunc;
 
 struct LocalEnvironment_tag {
+    char                *fuc_name;
+    int                 caller_line_number;
     VariableList        *local_variable;
     RefInNativeFunc     *ref_in_native_func;
     LocalEnvironment    *next;
@@ -376,6 +441,8 @@ struct ABC_Interpreter_tag {
 
 #define abc_is_logical_operator(operator) \
   ((operator) == LOGICAL_AND_EXPRESSION || (operator) == LOGICAL_OR_EXPRESSION)   
+
+#define map_is_rehashing(map) (map->rehash_idx >= 0)
 /* abc.c */
 ABC_Interpreter *abc_get_interpreter();
 int abc_get_line_number();
@@ -391,6 +458,9 @@ StatementResult abc_execute_statement_list(LocalEnvironment *env, StatementList 
 
 /* heap.c */
 void abc_garbage_collect();
+ABC_Object *abc_alloc_object(ObjectType type);
+ABC_Value *abc_search_assoc_member(ABC_Object *assoc, char *member_name);
+void abc_add_ref_in_native_method(LocalEnvironment *env, ABC_Object *obj);
 ABC_Object *abc_create_string(ABC_Char *str);
 ABC_Object *abc_create_array_safe(int size);
 ABC_Object *abc_create_array(LocalEnvironment *env, int size);
@@ -433,6 +503,7 @@ Expression *abc_create_string_expression(ABC_Char *str);
 Expression *abc_create_boolean_expression(ABC_Bool value);
 Expression *abc_create_null_expression(void);
 Expression *abc_create_array_expression(ExpressionList *list);
+Expression *abc_create_member_expression(Expression *expr, char *member_name);
 
 StatementList *abc_create_statement_list(Statement *statement);
 StatementList *abc_chain_statement_list(StatementList *list,
@@ -453,6 +524,7 @@ Statement *abc_create_continue_statement(void);
 /* util.c */
 void abc_add_global_variable(char *identifier, ABC_Value *value);
 void abc_add_local_variable(LocalEnvironment *env, char *identifier, ABC_Value *value);
+int abc_value_compare(ABC_Value *a, ABC_Value *b);
 
 /* memory.c */
 void *abc_storage_malloc(size_t size);
@@ -506,5 +578,15 @@ void abc_mbsntowcs(const char *src, int len, ABC_Char *dest);
 ABC_Char *abc_mbstowcs_alloc(const char *src);
 int abc_wcs_print(FILE *fp, ABC_Char *str);
 int abc_wcs_println(FILE *fp, ABC_Char *str);
+
+/* map.c */
+unsigned long hash_func(ABC_Value *key);
+
+ABC_Object *abc_create_hashmap_safe();
+ABC_Object *abc_create_hashmap(LocalEnvironment *env);
+ABC_Value abc_hashmap_set(ABC_Object *m, ABC_Value *key, ABC_Value *val);
+ABC_Value *abc_hashmap_get(ABC_Object *m, ABC_Value *key);
+int abc_hashmap_delete(ABC_Object *m, ABC_Value *key);
+
 
 #endif
